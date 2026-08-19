@@ -370,21 +370,58 @@ footer .footer-meta { display: grid; gap: 6px; }
 footer .credits { color: color-mix(in srgb, var(--muted) 82%, transparent); }
 footer a { color: var(--accent-dark); text-decoration: underline; text-underline-offset: 3px; }
 footer button { border: 0; padding: 0; background: none; color: var(--accent-dark); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
-.catalog-switch {
-  width: fit-content;
-  display: inline-flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 6px;
-  color: var(--muted);
-  text-align: left;
-  text-decoration: none;
+.catalog-selector {
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto 14px;
+  padding: 14px 15px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  border: 1px solid rgb(21 29 47 / 28%);
+  border-radius: 15px;
+  background: linear-gradient(135deg, rgb(21 29 47 / 5%), #f7f3eb 72%);
+  box-shadow: 0 10px 24px rgb(21 29 47 / 5%);
 }
-.catalog-switch b { color: var(--ink); }
-.catalog-switch small { color: var(--accent-dark); font-size: inherit; }
-.catalog-switch:hover:not(:disabled) small { text-decoration: underline; text-underline-offset: 3px; }
-.catalog-switch:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 3px; }
-.catalog-switch:disabled { cursor: not-allowed; opacity: .66; }
+.catalog-selector.extended {
+  border-color: rgb(213 156 50 / 62%);
+  background: linear-gradient(135deg, rgb(255 239 192 / 72%), #fffaf0 72%);
+  box-shadow: 0 10px 24px rgb(130 86 9 / 8%);
+}
+.catalog-selector-copy { min-width: 0; display: grid; gap: 3px; }
+.catalog-selector-kicker { color: var(--accent-dark); font-size: 10px; font-weight: 900; letter-spacing: .16em; }
+.catalog-selector-heading { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.catalog-selector-heading strong { color: var(--ink); font: 900 19px/1.2 "Noto Serif SC", "Songti SC", serif; }
+.catalog-current-badge { padding: 3px 7px; border-radius: 999px; color: white; background: var(--ink); font-size: 9px; font-weight: 900; }
+.catalog-selector.extended .catalog-current-badge { color: #3c2b08; background: var(--yellow); }
+.catalog-selector-copy > span:not(.catalog-selector-kicker) { color: var(--muted); font-size: 11px; line-height: 1.55; }
+.catalog-selector-copy small { color: var(--muted); font-size: 10px; }
+.catalog-selector-copy small.locked { color: var(--accent-dark); font-weight: 800; }
+.catalog-selector-actions { width: 292px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.catalog-selector-actions button {
+  min-width: 0;
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  color: var(--ink);
+  background: var(--panel);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+.catalog-selector-actions button span { width: 12px; flex: 0 0 12px; }
+.catalog-selector.standard .catalog-selector-actions button.active { border-color: var(--ink); color: white; background: var(--ink); }
+.catalog-selector.extended .catalog-selector-actions button.active { border-color: #c48b1d; color: #2f2208; background: var(--yellow); }
+.catalog-selector-actions button:hover:not(:disabled):not(.active) { border-color: var(--ink); transform: translateY(-1px); }
+.catalog-selector-actions button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.catalog-selector-actions button:disabled { cursor: not-allowed; opacity: .58; }
+.catalog-selector-actions button.active:disabled { opacity: 1; }
 
 .home-shell { min-height: 100vh; padding-bottom: 34px; }
 .home-topbar { position: relative; }
@@ -473,7 +510,6 @@ footer button { border: 0; padding: 0; background: none; color: var(--accent-dar
 .clue-shell .brand { color: var(--ink); text-decoration: none; }
 .clue-hero { margin-bottom: 26px; }
 .clue-panel { width: min(940px, calc(100% - 40px)); }
-.clue-catalog-bar { max-width: 820px; }
 .clue-current {
   max-width: 820px;
   min-height: 126px;
@@ -530,7 +566,7 @@ footer button { border: 0; padding: 0; background: none; color: var(--accent-dar
 .timeline-shell .brand { color: var(--ink); text-decoration: none; }
 .timeline-hero { margin-bottom: 26px; }
 .timeline-panel { width: min(900px, calc(100% - 40px)); }
-.timeline-catalog-bar { max-width: 760px; }
+.timeline-panel .catalog-selector { max-width: 760px; }
 .timeline-target {
   max-width: 760px;
   min-height: 144px;
@@ -830,7 +866,9 @@ footer button { border: 0; padding: 0; background: none; color: var(--accent-dar
   .summary-actions { display: grid; grid-template-columns: 1fr 1fr; }
   .summary-actions button { padding: 0 10px; }
   footer { width: calc(100% - 28px); flex-direction: column; align-items: center; gap: 10px; text-align: center; }
-  .catalog-switch { justify-content: center; text-align: center; }
+  .catalog-selector { grid-template-columns: 1fr; gap: 12px; padding: 14px; text-align: left; }
+  .catalog-selector-actions { width: 100%; }
+  .catalog-selector-actions button { min-height: 48px; }
   .modal { padding: 26px 20px; }
   .answer-cover { margin: -26px -20px 22px; height: 190px; }
   .result-modal.won .answer-cover { margin-bottom: 0; }

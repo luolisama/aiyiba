@@ -15,6 +15,7 @@ import { isRoundInvalidatedError, ROUND_INVALIDATED_MESSAGE } from "../round-err
 import type { ShareCardModel } from "../share-card";
 import { buildClueShareCardModel } from "../share-card-model.mjs";
 import { normalizeClueStats, recordClueResult, resetCluePoolStats } from "./client-logic.mjs";
+import CatalogSelector from "../catalog-selector";
 
 type PoolName = "normal" | "hardcore";
 type FinishReason = "guessed" | "attempts" | "surrender" | null;
@@ -189,8 +190,10 @@ export default function ClueLadderPage() {
       setShowResult(false);
       setShowSurrender(false);
       setLoadError("");
+      return true;
     } catch (error) {
       setLoadError(error instanceof Error ? error.message : "线索服务暂时不可用");
+      return false;
     } finally {
       setBusy(false);
     }
@@ -246,6 +249,16 @@ export default function ClueLadderPage() {
   const currentClueNumber = game?.clues.length ?? 1;
   const isFinalAttempt = !game?.finished && currentAttempt === maxAttempts;
   const locked = Boolean(game?.actions.length || game?.finished);
+
+  function changeCatalog(targetPool: PoolName) {
+    if (locked || busy || targetPool === pool) return;
+    void (async () => {
+      const changed = await startRound(targetPool);
+      if (!changed) return;
+      setToast(`已切换至${poolLabel(targetPool)}，本局题目已重新抽取`);
+      window.setTimeout(() => setToast(""), 2600);
+    })();
+  }
   const activeStats = stats.pools[pool];
   const winRate = activeStats.played ? Math.round(activeStats.wins / activeStats.played * 100) : 0;
   const averageStep = activeStats.wins ? (activeStats.totalWinningSteps / activeStats.wins).toFixed(1) : "—";
@@ -371,7 +384,7 @@ export default function ClueLadderPage() {
       <section className="hero clue-hero">
         <p className="round-status">CLUE LADDER · {poolLabel(pool)}</p>
         <h1>一层一层，<span>揭开这首作品</span></h1>
-        <p className="intro">前四次猜错或跳过会揭示下一条线索；第五次未命中后，保留现有线索进行最后作答。</p>
+        <p className="intro">从{poolLabel(pool)}的 {POOLS[pool].itemCount} 首作品中挑战。前四次猜错或跳过会揭示下一条线索；第五次未命中后，保留现有线索进行最后作答。</p>
         <div className="round-meter" aria-label={`当前第 ${currentAttempt} 次机会，共 ${maxAttempts} 次`}>
           {Array.from({ length: maxAttempts }, (_, index) => (
             <span key={index} className={index < game.actions.length ? "used" : index === currentAttempt - 1 && !game.finished ? "current" : ""} />
@@ -381,16 +394,7 @@ export default function ClueLadderPage() {
       </section>
 
       <section className="game-panel clue-panel">
-        <div className="mode-bar clue-catalog-bar">
-          <div className="mode-copy">
-            <strong>{poolLabel(pool)}</strong>
-            <span>{POOLS[pool].itemCount} 首作品 · 首次行动后锁定</span>
-          </div>
-          <div className="mode-actions">
-            <button className={pool === "normal" ? "active" : ""} disabled={locked || busy} onClick={() => void startRound("normal")}>标准</button>
-            <button className={pool === "hardcore" ? "active" : ""} disabled={locked || busy} onClick={() => void startRound("hardcore")}>扩展</button>
-          </div>
-        </div>
+        <CatalogSelector pool={pool} itemCount={POOLS[pool].itemCount} locked={locked} busy={busy} onChange={changeCatalog} />
 
         <section className="clue-current" aria-live="polite">
           <span className="clue-step-mark">{currentClueNumber.toString().padStart(2, "0")}</span>

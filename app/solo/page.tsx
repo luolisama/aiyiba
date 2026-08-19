@@ -11,6 +11,7 @@ import type { ShareCardModel } from "../share-card";
 import { isExtendedOnlySong } from "../catalog-logic.mjs";
 import { buildSingleShareCardModel } from "../share-card-model.mjs";
 import { isRoundInvalidatedError, ROUND_INVALIDATED_MESSAGE } from "../round-errors.mjs";
+import CatalogSelector from "../catalog-selector";
 import {
   addModeResult,
   countTitleCharacters,
@@ -483,8 +484,7 @@ export function SinglePlayerPage() {
     void (async () => {
       const changed = await startServerRound(game.mode, targetPool);
       if (!changed) return;
-      const targetCatalog = poolFor(targetPool).catalog;
-      setToast(`已切换为${poolLabel(targetPool)}，下一题将从 ${targetCatalog.itemCount} 首作品中抽取`);
+      setToast(`已切换至${poolLabel(targetPool)}，本局题目已重新抽取`);
       window.setTimeout(() => setToast(""), 2600);
     })();
   }
@@ -740,7 +740,7 @@ export function SinglePlayerPage() {
 
       <section className="hero">
         <h1>听过很多遍，<br /><span>你真的认得它吗？</span></h1>
-        <p className="intro">{isExtendedCatalog ? `从扩展题库的 ${catalog.itemCount} 首作品中` : `从 ${catalog.itemCount} 首 ilem 音乐投稿中`}找出本局答案。每猜一次，线索就更近一点。</p>
+        <p className="intro">从{poolLabel(poolName)}的 {catalog.itemCount} 首作品中找出本局答案。每猜一次，线索就更近一点。</p>
         <div className={`round-meter ${game.finished ? "finished" : ""}`} aria-label={`已经猜了 ${guesses.length} 次，共 ${maxGuesses} 次机会`}>
           {Array.from({ length: maxGuesses }, (_, index) => (
             <span key={index} className={index < guesses.length ? "used" : !game.finished && index === guesses.length ? "current" : ""} />
@@ -750,6 +750,13 @@ export function SinglePlayerPage() {
       </section>
 
       <section className="game-panel" aria-label="猜歌区域">
+        <CatalogSelector
+          pool={poolName}
+          itemCount={catalog.itemCount}
+          locked={modeLocked}
+          busy={requestBusy}
+          onChange={changeCatalog}
+        />
         <div className="mode-bar">
           <div className="mode-copy">
             <strong>{isHardMode ? "困难模式" : "普通模式"}</strong>
@@ -867,16 +874,7 @@ export function SinglePlayerPage() {
 
       <footer>
         <div className="footer-meta">
-          <button
-            className="catalog-switch"
-            type="button"
-            disabled={modeLocked || requestBusy}
-            onClick={() => changeCatalog(isExtendedCatalog ? "normal" : "hardcore")}
-            aria-label={`当前${poolLabel(poolName)}，${modeLocked ? "本局已锁定" : `切换为${poolLabel(isExtendedCatalog ? "normal" : "hardcore")}`}`}
-          >
-            <span>题库：<b>{poolLabel(poolName)}</b> · {catalog.itemCount} 首</span>
-            <small>{modeLocked ? "本局已锁定" : requestBusy ? "正在切换…" : `切换为${poolLabel(isExtendedCatalog ? "normal" : "hardcore")} ↔`}</small>
-          </button>
+          <span>题库：{poolLabel(poolName)} · {catalog.itemCount} 首</span>
           <span>播放量快照：{catalog.viewsSnapshotDate}</span>
           <span className="credits">
             如果对这个项目有什么意见或者数据有误联系<a href="https://space.bilibili.com/477277447/" target="_blank" rel="noreferrer">叁忆玖</a>。记得支持i12喵，关注<a href="https://space.bilibili.com/372295491" target="_blank" rel="noreferrer">站宝</a>喵，关注<a href="https://space.bilibili.com/372295491" target="_blank" rel="noreferrer">站宝</a>谢谢喵！ · 感谢<a href="https://space.bilibili.com/3493105640671353" target="_blank" rel="noreferrer">元应如是</a>提供了数据支持 · 感谢一个坑提供了域名解析帮助
@@ -900,7 +898,7 @@ export function SinglePlayerPage() {
             <ul>
               <li><b>标准题库</b>收录 ilem Bilibili 视频投稿中的音乐作品。</li>
               <li><b>扩展题库</b>在标准题库基础上，补充了ilem/onyk作为staff参与的原创作品和被删除的作品。(不包含翻唱和remix)</li>
-              <li>题库可在第一次猜测前，点击页面底部的题库信息切换。</li>
+              <li>题库可在本局开始前，通过游戏面板顶部的“本局题库”切换。</li>
               <li>播放量为定期更新的精确数字快照，不是实时数据。</li>
               <li>纯音乐的演唱与引擎均记为“无”。</li>
               <li>投稿日期年月日完全一致为绿色；年份相同但月日不同为黄色。</li>

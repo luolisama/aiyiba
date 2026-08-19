@@ -4,8 +4,15 @@ import Link from "next/link";
 import RulesDialog from "../rules-dialog";
 import { isRoundInvalidatedError, ROUND_INVALIDATED_MESSAGE } from "../round-errors.mjs";
 import { useCallback, useEffect, useState } from "react";
+import searchSongsJson from "../data/search-songs.json";
+import hardcoreSearchSongsJson from "../data/hardcore-search-songs.json";
+import CatalogSelector from "../catalog-selector";
 
 type PoolName = "normal" | "hardcore";
+const POOL_COUNTS: Record<PoolName, number> = {
+  normal: searchSongsJson.itemCount,
+  hardcore: hardcoreSearchSongsJson.itemCount,
+};
 type TimelineSong = {
   bvid: string;
   name: string;
@@ -134,8 +141,10 @@ export default function TimelinePage() {
       updateCatalogUrl(targetPool);
       setLoadError("");
       setToast("");
+      return true;
     } catch (error) {
       setLoadError(error instanceof Error ? error.message : "时光机暂时无法启动");
+      return false;
     } finally {
       setBusy(false);
     }
@@ -208,6 +217,16 @@ export default function TimelinePage() {
 
   const currentTurn = Math.min(game.maxPlacements, game.placements.length + 1);
   const locked = game.placements.length > 0 || game.finished;
+
+  function changeCatalog(targetPool: PoolName) {
+    if (locked || busy || targetPool === pool) return;
+    void (async () => {
+      const changed = await startRound(targetPool);
+      if (!changed) return;
+      setToast(`已切换至${poolLabel(targetPool)}，本局题目已重新抽取`);
+      window.setTimeout(() => setToast(""), 2600);
+    })();
+  }
   const placementByBvid = new Map(game.placements.map((placement) => [placement.bvid, placement]));
 
   return (
@@ -229,7 +248,7 @@ export default function TimelinePage() {
       <section className="hero timeline-hero">
         <p className="round-status">TIME MACHINE · {poolLabel(pool)}</p>
         <h1>把作品放回，<span>它所在的年代</span></h1>
-        <p className="intro">看作品名判断发布时间，把它插入正确的时间线。放置后会立即揭晓真实日期。</p>
+        <p className="intro">从{poolLabel(pool)}的 {POOL_COUNTS[pool]} 首作品中，看作品名判断发布时间，把它插入正确的时间线。</p>
         <div className="round-meter" aria-label={`当前第 ${currentTurn} 轮，共 ${game.maxPlacements} 轮`}>
           {Array.from({ length: game.maxPlacements }, (_, index) => (
             <span key={index} className={index < game.placements.length ? "used" : index === currentTurn - 1 && !game.finished ? "current" : ""} />
@@ -239,16 +258,7 @@ export default function TimelinePage() {
       </section>
 
       <section className="game-panel timeline-panel">
-        <div className="mode-bar timeline-catalog-bar">
-          <div className="mode-copy">
-            <strong>{poolLabel(pool)}</strong>
-            <span>首次放置后锁定 · 当前得分 {game.score}</span>
-          </div>
-          <div className="mode-actions">
-            <button className={pool === "normal" ? "active" : ""} disabled={locked || busy} onClick={() => void startRound("normal")}>标准</button>
-            <button className={pool === "hardcore" ? "active" : ""} disabled={locked || busy} onClick={() => void startRound("hardcore")}>扩展</button>
-          </div>
-        </div>
+        <CatalogSelector pool={pool} itemCount={POOL_COUNTS[pool]} locked={locked} busy={busy} onChange={changeCatalog} />
 
         {!game.finished && game.target && (
           <section className="timeline-target" aria-live="polite">
