@@ -1,0 +1,1498 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-10",
+  "viewsSnapshotDate": "2026-08-10",
+  "itemCount": 81,
+  "items": [
+    {
+      "bvid": "BV1WFjd6BEe2",
+      "name": "Old Sad Song",
+      "bilibiliTitle": "《Old Sad Song》老丧歌 【新世代音乐人】ilem",
+      "publicationDate": "2026-06-24",
+      "vocalists": [
+        "ilem"
+      ],
+      "engines": [
+        "无"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 676906,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/94f25b39a4914014c1e8dfc8ebd905ac30c9589d.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1WFjd6BEe2/"
+    },
+    {
+      "bvid": "BV1Y2oNB1ESs",
+      "name": "告死鸟",
+      "bilibiliTitle": "洛天依 原创《告死鸟》",
+      "publicationDate": "2026-04-20",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "ACE Studio"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 3480848,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/bcf868164e776e8de920e5ae3ec060ba0113ee82.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Y2oNB1ESs/"
+    },
+    {
+      "bvid": "BV18sZ7BGEtz",
+      "name": "皆不过",
+      "bilibiliTitle": "皆不过【2026拜年纪单品】",
+      "publicationDate": "2026-02-16",
+      "vocalists": [
+        "李常超"
+      ],
+      "engines": [
+        "无"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 927546,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/657a6fb0383dd7793fb2f4c51e751f3417b92f39.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV18sZ7BGEtz/"
+    },
+    {
+      "bvid": "BV1jN7xzoEp7",
+      "name": "脑壳疼",
+      "bilibiliTitle": "洛天依 原创《脑壳疼》",
+      "publicationDate": "2025-05-31",
+      "vocalists": [
+        "ilem",
+        "洛天依"
+      ],
+      "engines": [
+        "ACE Studio"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 799645,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/f3ae2284bbda8b8fbab7c0ffa27e9b3ba8380fa6.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1jN7xzoEp7/"
+    },
+    {
+      "bvid": "BV1qZ5SzoE9j",
+      "name": "气球",
+      "bilibiliTitle": "【洛天依】气球",
+      "publicationDate": "2025-04-27",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "ACE Studio"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 283051,
+      "viewTier": "殿堂曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/ccca3109064e7f027414e50ac0d3cd15424516ee.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1qZ5SzoE9j/"
+    },
+    {
+      "bvid": "BV183dpYFERP",
+      "name": "千年醒",
+      "bilibiliTitle": "《物华弥新》周年印象曲「千年醒」",
+      "publicationDate": "2025-04-10",
+      "vocalists": [
+        "祖娅纳惜",
+        "CrazyMo救世界"
+      ],
+      "engines": [
+        "无"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 949253,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/6c72bdd3260c41ee6fa1b1652b37a0d66f3a8cda.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV183dpYFERP/"
+    },
+    {
+      "bvid": "BV1Dn4y1975A",
+      "name": "床边哲学我",
+      "bilibiliTitle": "『床边哲学我』抽象！！！！！！！！ 【原创PV】",
+      "publicationDate": "2024-06-21",
+      "vocalists": [
+        "林震linz"
+      ],
+      "engines": [
+        "无"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 315780,
+      "viewTier": "殿堂曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/00028bd75dfb43dc30a90caf24ce0d55be890853.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Dn4y1975A/"
+    },
+    {
+      "bvid": "BV157421T7Na",
+      "name": "来春打马",
+      "bilibiliTitle": "原创《来春打马》ilem",
+      "publicationDate": "2024-02-04",
+      "vocalists": [
+        "ilem"
+      ],
+      "engines": [
+        "无"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 2755072,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/19684d72782c200eb642b0034ff7d11af37525de.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV157421T7Na/"
+    },
+    {
+      "bvid": "BV1qH4y1X7KZ",
+      "name": "四风判词",
+      "bilibiliTitle": "洛天依 《四风判词》",
+      "publicationDate": "2023-09-05",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "ACE Studio"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 1899133,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/eb7f3852b5d6586ae81bf05a2d565f58a1faa24d.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1qH4y1X7KZ/"
+    },
+    {
+      "bvid": "BV1Xs4y1377m",
+      "name": "大地球歌厅",
+      "bilibiliTitle": "【ilem&洛天依原创合作曲】大地球歌厅【正式开业 一起来唱！】",
+      "publicationDate": "2023-05-06",
+      "vocalists": [
+        "洛天依",
+        "ilem"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 1284993,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/0a5af9c2b05d10865c311f3d9f0d3928af551eaa.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Xs4y1377m/"
+    },
+    {
+      "bvid": "BV1bR4y1a7eW",
+      "name": "小孩小孩",
+      "bilibiliTitle": "小孩小孩【2023拜年纪单品】",
+      "publicationDate": "2023-01-21",
+      "vocalists": [
+        "传说中的刷牙者"
+      ],
+      "engines": [
+        "无"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 2518288,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/17a9e6db668e7f141306cd7147f09d22dcddca68.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1bR4y1a7eW/"
+    },
+    {
+      "bvid": "BV1Xe411F7bq",
+      "name": "开心高兴歌",
+      "bilibiliTitle": "开心高兴歌",
+      "publicationDate": "2022-12-19",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 3090284,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/d86f8dcd0ae3051d61fae66968f895c833702984.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Xe411F7bq/"
+    },
+    {
+      "bvid": "BV1za411X7BJ",
+      "name": "大吉",
+      "bilibiliTitle": "洛天依 原创《大吉》",
+      "publicationDate": "2022-07-05",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 3021307,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/6447b616eff43645cb03aa09df4486dcf9270bd5.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1za411X7BJ/"
+    },
+    {
+      "bvid": "BV1wT4y1k7Pw",
+      "name": "白鸟过河滩",
+      "bilibiliTitle": "洛天依 原创《白鸟过河滩》",
+      "publicationDate": "2022-05-02",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 7452036,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/bc03f29e775a6210efddf317b86024ed6360eff7.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1wT4y1k7Pw/"
+    },
+    {
+      "bvid": "BV11L411F7J7",
+      "name": "烟火赴新年",
+      "bilibiliTitle": "一起《烟火赴新年》！【咻咻满×翠花×ilem】虎年贺岁曲",
+      "publicationDate": "2022-01-31",
+      "vocalists": [
+        "咻咻满",
+        "翠花"
+      ],
+      "engines": [
+        "无"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 945600,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/34c4b3dbd16c0124303889dea0172bb629ce9fab.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV11L411F7J7/"
+    },
+    {
+      "bvid": "BV1WR4y147x4",
+      "name": "我没有歌能给你听",
+      "bilibiliTitle": "洛天依 乐正绫 原创《我没有歌能给你听》",
+      "publicationDate": "2021-11-27",
+      "vocalists": [
+        "洛天依",
+        "乐正绫"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 2457713,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/908ef40f8e159fc24950fe6fb4779a5befc0899c.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1WR4y147x4/"
+    },
+    {
+      "bvid": "BV1nP4y1W7dr",
+      "name": "石头歌",
+      "bilibiliTitle": "【三无】石头歌【专辑曲】",
+      "publicationDate": "2021-08-08",
+      "vocalists": [
+        "三无Marblue"
+      ],
+      "engines": [
+        "无"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 1962674,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/07229b70cdf7c7cd736520402f59e3e380ba4b0f.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1nP4y1W7dr/"
+    },
+    {
+      "bvid": "BV1Lw411d7vS",
+      "name": "斩草歌",
+      "bilibiliTitle": "【萨顶顶 X ilem 原创】《斩草歌》震撼合作究极上头，斩妖念诵与教主的惊喜碰撞",
+      "publicationDate": "2021-07-07",
+      "vocalists": [
+        "萨顶顶"
+      ],
+      "engines": [
+        "无"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 1712687,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/fef0bc61b6a951fe24da2533bcfc12550b7f2ecd.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Lw411d7vS/"
+    },
+    {
+      "bvid": "BV1UA411G7aS",
+      "name": "梦良衣",
+      "bilibiliTitle": "《梦良衣》 赤羽 原创",
+      "publicationDate": "2021-05-11",
+      "vocalists": [
+        "赤羽"
+      ],
+      "engines": [
+        "Synthesizer V"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 1532920,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/2cae6667dd28988686d5416e0db1efa6bcf4ed57.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1UA411G7aS/"
+    },
+    {
+      "bvid": "BV17y4y1q7ex",
+      "name": "泥汤",
+      "bilibiliTitle": "洛天依 原创《泥汤》",
+      "publicationDate": "2020-12-02",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 1667257,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/70fc1eda41c4b13c9a654f21710611c382e91365.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV17y4y1q7ex/"
+    },
+    {
+      "bvid": "BV1p5411879s",
+      "name": "苍蝇",
+      "bilibiliTitle": "《苍蝇》 赤羽 原创",
+      "publicationDate": "2020-08-10",
+      "vocalists": [
+        "赤羽"
+      ],
+      "engines": [
+        "Synthesizer V"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 11400280,
+      "viewTier": "神话曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/b7cb2a863765039ffb835f5e92a9e9edb832ec00.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1p5411879s/"
+    },
+    {
+      "bvid": "BV1oc411h7mR",
+      "name": "看星星",
+      "bilibiliTitle": "星尘，徵羽摩柯 原创《看星星》",
+      "publicationDate": "2020-04-08",
+      "vocalists": [
+        "星尘",
+        "徵羽摩柯"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 665072,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/85003e21f7c09c6feeb3c14b57094f34c4bc7ffa.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1oc411h7mR/"
+    },
+    {
+      "bvid": "BV1zJ411479H",
+      "name": "上山岗",
+      "bilibiliTitle": "洛天依 原创《上山岗》",
+      "publicationDate": "2019-12-22",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 4656293,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/1fba293607be58d528e91aec66c3200ac85f9140.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1zJ411479H/"
+    },
+    {
+      "bvid": "BV1x4411K7ck",
+      "name": "保卫罗德岛",
+      "bilibiliTitle": "洛天依 原创《保卫罗德岛》",
+      "publicationDate": "2019-06-11",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 1545870,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/18b567334fe3388a1bbe4a0eae2f255f9b7001d0.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1x4411K7ck/"
+    },
+    {
+      "bvid": "BV134411h7XX",
+      "name": "售楼小姐",
+      "bilibiliTitle": "洛天依，原创《售楼小姐》",
+      "publicationDate": "2019-04-26",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 3572374,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/e1d0292869a134355ad45615b041cc66bd35b926.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV134411h7XX/"
+    },
+    {
+      "bvid": "BV19b41157sK",
+      "name": "威海",
+      "bilibiliTitle": "乐正龙牙，原创《威海》",
+      "publicationDate": "2019-04-18",
+      "vocalists": [
+        "乐正龙牙"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 522194,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/f05e8faaba9145fa99f284ababaa6137aaa70c2e.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV19b41157sK/"
+    },
+    {
+      "bvid": "BV1ab411M7zx",
+      "name": "写给我家狗的歌",
+      "bilibiliTitle": "洛天依，原创《写给我家狗的歌》",
+      "publicationDate": "2019-04-11",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 705344,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/4f821e8c79ed343f5663c15c3b5348d93f86683f.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1ab411M7zx/"
+    },
+    {
+      "bvid": "BV1Zb411j7vb",
+      "name": "得过且过的勇者",
+      "bilibiliTitle": "洛天依，言和 原创《得过且过的勇者》",
+      "publicationDate": "2019-03-22",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 3025419,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/26d5cd253756afe3b593da983e2cf1534f80874c.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Zb411j7vb/"
+    },
+    {
+      "bvid": "BV14b411b7Vr",
+      "name": "大氿歌",
+      "bilibiliTitle": "洛天依，原创《大氿歌》  干了这碗酒，四海皆亲友",
+      "publicationDate": "2019-03-01",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 4126260,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/b400ae53242fd2784a588e82ea3e0050f1d0f1e4.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV14b411b7Vr/"
+    },
+    {
+      "bvid": "BV1vb411Y7A6",
+      "name": "夜间出租车",
+      "bilibiliTitle": "洛天依，原创《夜间出租车》",
+      "publicationDate": "2019-02-21",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 2168514,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/d58b6de2016cf0251315a4030eccbbb527301098.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1vb411Y7A6/"
+    },
+    {
+      "bvid": "BV1Jb411U7u2",
+      "name": "勾指起誓",
+      "bilibiliTitle": "洛天依，原创《勾指起誓》",
+      "publicationDate": "2019-02-13",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 22579168,
+      "viewTier": "神话曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/7591c89704b448cd94a0cf749e65a39833c68d4f.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Jb411U7u2/"
+    },
+    {
+      "bvid": "BV1Bt411z799",
+      "name": "鸽子",
+      "bilibiliTitle": "洛天依，言和原创《鸽子》",
+      "publicationDate": "2018-12-29",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 2707584,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/82bdf538da2e1d63cf6b33eedd84b5d4adc957b2.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Bt411z799/"
+    },
+    {
+      "bvid": "BV1rt411f75e",
+      "name": "傲娇系男孩的告白日",
+      "bilibiliTitle": "乐正绫 原创《傲娇系男孩的告白日》（专辑《绫》收录）",
+      "publicationDate": "2018-10-12",
+      "vocalists": [
+        "乐正绫"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 1626444,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/c231e34488fe43f3b73d2559758a2baf7b3cf47f.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1rt411f75e/"
+    },
+    {
+      "bvid": "BV1xs41137Vm",
+      "name": "〇",
+      "bilibiliTitle": "洛天依 原创《〇》",
+      "publicationDate": "2018-08-03",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 2014613,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/58b90bd88b7fac32f91778894a1153e9a8d9858c.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1xs41137Vm/"
+    },
+    {
+      "bvid": "BV1jp411R7V2",
+      "name": "2014年7月6日完成的纯音乐untitled",
+      "bilibiliTitle": "《2014年7月6日完成的纯音乐untitled》",
+      "publicationDate": "2018-05-25",
+      "vocalists": [
+        "无"
+      ],
+      "engines": [
+        "无"
+      ],
+      "workType": "纯音乐",
+      "gameRole": "easter_egg",
+      "views": 556411,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/3efd54ad91fa308b80cbd5d5d8ea84029371e147.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1jp411R7V2/"
+    },
+    {
+      "bvid": "BV18W411v7Cx",
+      "name": "9Bang15便士",
+      "bilibiliTitle": "洛天依原创《9Bang15便士》",
+      "publicationDate": "2018-01-18",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 2542929,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/b9295c862243ccedd4675a08de034d5bde6e1a79.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV18W411v7Cx/"
+    },
+    {
+      "bvid": "BV1sx411x7o4",
+      "name": "欧菲香",
+      "bilibiliTitle": "洛天依，言和 原创《欧菲香》",
+      "publicationDate": "2017-09-22",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 953332,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/eca3c479f0da23a8d4935c6266a8bb7f4160967e.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1sx411x7o4/"
+    },
+    {
+      "bvid": "BV1rx411a7CH",
+      "name": "车",
+      "bilibiliTitle": "洛天依 原创《车》",
+      "publicationDate": "2017-06-08",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 905003,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/9bc1bd0604d6ad0fcf0eec0663d01be5fbac6264.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1rx411a7CH/"
+    },
+    {
+      "bvid": "BV1rx411D7AB",
+      "name": "上下上下",
+      "bilibiliTitle": "洛天依 原创《上下上下》",
+      "publicationDate": "2017-04-19",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 1042239,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/28da000a558ceb8e073dc0edf7ecfea603587f09.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1rx411D7AB/"
+    },
+    {
+      "bvid": "BV1sx411k7ug",
+      "name": "达拉崩吧",
+      "bilibiliTitle": "洛天依，言和 原创《达拉崩吧》",
+      "publicationDate": "2017-03-25",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 16073586,
+      "viewTier": "神话曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/431a3a24e7ad2db631611c9d0f57e59e18a60e0e.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1sx411k7ug/"
+    },
+    {
+      "bvid": "BV16s411Y7Si",
+      "name": "深夜诗人",
+      "bilibiliTitle": "洛天依，言和原创《深夜诗人》",
+      "publicationDate": "2016-12-05",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 6582549,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/4885c181e0a16d2e94d2a5b1412c8d5de6e5af10.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV16s411Y7Si/"
+    },
+    {
+      "bvid": "BV1Zs411r7Rc",
+      "name": "埃及方块",
+      "bilibiliTitle": "洛天依，言舞原创 《埃及方块》",
+      "publicationDate": "2016-08-16",
+      "vocalists": [
+        "洛天依",
+        "言舞"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 1210824,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/9befbe44e3f74b95b5403302711bad639d8581a4.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Zs411r7Rc/"
+    },
+    {
+      "bvid": "BV1Qs411y7Ah",
+      "name": "最美的夏天",
+      "bilibiliTitle": "洛天依 原创《最美的夏天》",
+      "publicationDate": "2016-07-16",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 1414237,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/b0c1ccfab6ce9ea869fa18fe4108858d957092f2.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Qs411y7Ah/"
+    },
+    {
+      "bvid": "BV1Ys411i7Ea",
+      "name": "尖叫鸭子",
+      "bilibiliTitle": "尖叫鸭子 原创《尖叫鸭子》feat.卡祖笛",
+      "publicationDate": "2016-05-30",
+      "vocalists": [
+        "无"
+      ],
+      "engines": [
+        "无"
+      ],
+      "workType": "纯音乐",
+      "gameRole": "easter_egg",
+      "views": 977661,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/975b37ea6d5dd43d8c13063f7cc83e0e398cd021.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Ys411i7Ea/"
+    },
+    {
+      "bvid": "BV12s411q7Br",
+      "name": "牧星者",
+      "bilibiliTitle": "星尘 原创《牧星者》",
+      "publicationDate": "2016-04-28",
+      "vocalists": [
+        "星尘"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 1066578,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/51e726e913f284eda637b0c79b53ca18c7d252fb.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV12s411q7Br/"
+    },
+    {
+      "bvid": "BV1Xs411B7DK",
+      "name": "燕子",
+      "bilibiliTitle": "Rana原创《燕子》",
+      "publicationDate": "2016-03-29",
+      "vocalists": [
+        "Rana"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 533527,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/22cf63b4b49376358dee9c8156ffd034a688d77e.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Xs411B7DK/"
+    },
+    {
+      "bvid": "BV1Ys411X7vP",
+      "name": "一人行者",
+      "bilibiliTitle": "心华原创《一人行者》",
+      "publicationDate": "2016-01-30",
+      "vocalists": [
+        "心华"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 1884454,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/f7b4adcf28588a7204242424e72fedc3d0e65435.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Ys411X7vP/"
+    },
+    {
+      "bvid": "BV1Xs41197Av",
+      "name": "写给我第一个喜欢的女孩的歌",
+      "bilibiliTitle": "洛天依原创《写给我第一个喜欢的女孩的歌》",
+      "publicationDate": "2015-12-24",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 4343834,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/14071f0c42b329a1e5d6de0eca02bac56d9b9cf3.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Xs41197Av/"
+    },
+    {
+      "bvid": "BV1Vs411d7iP",
+      "name": "大時代",
+      "bilibiliTitle": "心华，乐正绫原创《大時代》",
+      "searchAliases": [
+        "大时代"
+      ],
+      "publicationDate": "2015-11-07",
+      "vocalists": [
+        "心华",
+        "乐正绫"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 1339887,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/77d5f6237a0c2df19e5ceab181fd1f0ae7ce6d9c.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Vs411d7iP/"
+    },
+    {
+      "bvid": "BV1Bs41127pL",
+      "name": "今天的诗",
+      "bilibiliTitle": "新葛平 原创《今天的诗》",
+      "publicationDate": "2015-10-24",
+      "vocalists": [
+        "葛平"
+      ],
+      "engines": [
+        "UTAU"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 522749,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/c01adc998677959910f7b027720d6c8631311ce4.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Bs41127pL/"
+    },
+    {
+      "bvid": "BV15s41127yg",
+      "name": "花儿纳吉",
+      "bilibiliTitle": "洛天依，言和原创《花儿纳吉》",
+      "publicationDate": "2015-10-08",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 2099069,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/ad30ee5454d8cbf477a8e472ac92b3705f0251ca.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV15s41127yg/"
+    },
+    {
+      "bvid": "BV1ts411S7KC",
+      "name": "葬歌",
+      "bilibiliTitle": "洛天依，言和原创《葬歌》",
+      "publicationDate": "2015-07-22",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 5297836,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/c386c3261814f11df150bd01f258296759ccb529.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1ts411S7KC/"
+    },
+    {
+      "bvid": "BV1ts411U7DM",
+      "name": "大艺术家",
+      "bilibiliTitle": "洛天依，言和原创，相声《大艺术家》",
+      "publicationDate": "2015-06-08",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 1573204,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/cecdae088025de89fcea6ab64d5f67c54f04441b.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1ts411U7DM/"
+    },
+    {
+      "bvid": "BV1rs411D7DJ",
+      "name": "星雨之夜",
+      "bilibiliTitle": "心华原创《星雨之夜》",
+      "publicationDate": "2015-05-05",
+      "vocalists": [
+        "心华"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 746840,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/afa4ec63e1394771ba01f3953923df2cf52d4a3f.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1rs411D7DJ/"
+    },
+    {
+      "bvid": "BV1zs411S7sz",
+      "name": "普通DISCO",
+      "bilibiliTitle": "洛天依，言和原创《普通DISCO》",
+      "publicationDate": "2015-03-21",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 24747168,
+      "viewTier": "神话曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/89252dadd2525f8190485a069f73cdf3d783cabc.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1zs411S7sz/"
+    },
+    {
+      "bvid": "BV1ex411A7WN",
+      "name": "Song For You",
+      "bilibiliTitle": "言和，英文原创《Song For You》【DC次元裂缝】",
+      "publicationDate": "2015-02-21",
+      "vocalists": [
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 542462,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/4b37efe7fb20c5bed10d1da26ac4240bab16c4e8.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1ex411A7WN/"
+    },
+    {
+      "bvid": "BV1tx411A71m",
+      "name": "阴阳先生",
+      "bilibiliTitle": "洛天依，言和原创《阴阳先生》",
+      "publicationDate": "2015-02-08",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 7257280,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/fcd1ff113f862ad3933ccb2fba68db469a2d2e0a.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1tx411A71m/"
+    },
+    {
+      "bvid": "BV1Px411A71E",
+      "name": "葛平之歌",
+      "bilibiliTitle": "葛平原创《葛平之歌》【一图】",
+      "publicationDate": "2015-01-26",
+      "vocalists": [
+        "葛平"
+      ],
+      "engines": [
+        "UTAU"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 651925,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/7e58eace8a561061d2e4f7941acf7b395c6c6e89.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Px411A71E/"
+    },
+    {
+      "bvid": "BV1Ux411w7QM",
+      "name": "神经病之歌",
+      "bilibiliTitle": "洛天依，言和《神经病之歌》",
+      "publicationDate": "2014-12-30",
+      "vocalists": [
+        "洛天依",
+        "言和",
+        "初音未来"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 5538581,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/4a3e2db1cbd3283b207c475f314dee162b42d729.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Ux411w7QM/"
+    },
+    {
+      "bvid": "BV1Ax411N777",
+      "name": "新贵妃醉酒",
+      "bilibiliTitle": "葛平《新贵妃醉酒》【UTAU初尝试】",
+      "publicationDate": "2014-12-09",
+      "vocalists": [
+        "葛平"
+      ],
+      "engines": [
+        "UTAU"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 233467,
+      "viewTier": "殿堂曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/79642f4df00f2fe4276f1931dd8c7b804d899d92.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Ax411N777/"
+    },
+    {
+      "bvid": "BV1dx411P723",
+      "name": "弗拉门戈之星",
+      "bilibiliTitle": "洛天依原创《弗拉门戈之星》【PPT付】",
+      "publicationDate": "2014-12-02",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 276854,
+      "viewTier": "殿堂曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/3345aae9ea626d5f5f511bc76fd5faf6b0aaa236.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1dx411P723/"
+    },
+    {
+      "bvid": "BV1mx411P7zP",
+      "name": "孤高光棍歌",
+      "bilibiliTitle": "洛天依与言和代替UP主倾情献唱《孤高光棍歌》",
+      "publicationDate": "2014-11-11",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 671355,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/45a6773cff913816c13f88eb6aa7fa090245ef15.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1mx411P7zP/"
+    },
+    {
+      "bvid": "BV1rx411P7HZ",
+      "name": "怪物大暴走",
+      "bilibiliTitle": "洛天依，言和原创《怪物大暴走》",
+      "publicationDate": "2014-11-05",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 3801020,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/7ac5e2817301aab2e2661e55354f89a2a1eb8458.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1rx411P7HZ/"
+    },
+    {
+      "bvid": "BV1Ax411P7Aj",
+      "name": "言氏战鼓",
+      "bilibiliTitle": "言和原创《言氏战鼓》",
+      "publicationDate": "2014-10-06",
+      "vocalists": [
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 547610,
+      "viewTier": "专兑曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/245a996651474662acee55e9ef4ffe0cebaf5fe1.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Ax411P7Aj/"
+    },
+    {
+      "bvid": "BV1px411K7Zp",
+      "name": "离乡",
+      "bilibiliTitle": "洛天依原创《离乡》",
+      "publicationDate": "2014-09-13",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 421288,
+      "viewTier": "殿堂曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/778817733246a5ea0305f1f3b70443bb8b262116.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1px411K7Zp/"
+    },
+    {
+      "bvid": "BV1Jx411K7yY",
+      "name": "僵尸舞",
+      "bilibiliTitle": "洛天依原创《僵尸舞》",
+      "publicationDate": "2014-08-31",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 3947496,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/96a09919a31a0240b7644bd4fbd372997c093f78.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Jx411K7yY/"
+    },
+    {
+      "bvid": "BV1ux411K7A4",
+      "name": "最忆江南",
+      "bilibiliTitle": "洛天依原创《最忆江南》",
+      "publicationDate": "2014-08-22",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 240876,
+      "viewTier": "殿堂曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/678ea070dc0abcdc70ca5b957a65d25fadd90e29.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1ux411K7A4/"
+    },
+    {
+      "bvid": "BV1dx411N7W9",
+      "name": "今天没吃药",
+      "bilibiliTitle": " 洛天依原创《今天没吃药》",
+      "publicationDate": "2014-08-19",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 3698236,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/f079953e5f356d3de6b302cd0185f35ee423f62f.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1dx411N7W9/"
+    },
+    {
+      "bvid": "BV1Fx411K7aC",
+      "name": "一样",
+      "bilibiliTitle": "洛天依原创《一样》",
+      "publicationDate": "2014-08-16",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 488325,
+      "viewTier": "殿堂曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/b6469b7876023ea627d2b3c5205f715818cc92b5.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Fx411K7aC/"
+    },
+    {
+      "bvid": "BV1Qx411N7um",
+      "name": "4分钟！教你制作一段音乐",
+      "bilibiliTitle": "4分钟！教你制作一段音乐",
+      "publicationDate": "2014-08-08",
+      "vocalists": [
+        "无"
+      ],
+      "engines": [
+        "无"
+      ],
+      "workType": "纯音乐",
+      "gameRole": "easter_egg",
+      "views": 1111304,
+      "viewTier": "传说曲",
+      "coverUrl": "https://i0.hdslb.com/bfs/archive/33d56a5c0a06cb7009dc3c02412c8f4d16f1f0c4.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Qx411N7um/"
+    },
+    {
+      "bvid": "BV13s411R7wd",
+      "name": "少女武神",
+      "bilibiliTitle": "【洛天依原创】少女武神【莫与人辩|雨狸|手环|ilem|阿原|Misaki|某某汉子|墨兰花语】",
+      "publicationDate": "2016-01-07",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 262431,
+      "viewTier": "殿堂曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/3a74e473f30cb2e77a6d139b01dee053ee5dd7a7.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV13s411R7wd/"
+    },
+    {
+      "bvid": "BV1jx411P73q",
+      "name": "绝笔·子不语",
+      "bilibiliTitle": "【洛天依古风原创】绝笔·子不语【南北组】【DC次元裂缝社】",
+      "publicationDate": "2014-10-19",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 72546,
+      "viewTier": "普通曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/49352a656574763684e2124186c3ed6a0953b97c.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1jx411P73q/"
+    },
+    {
+      "bvid": "BV1dT4y1d7Nq",
+      "name": "小白方",
+      "bilibiliTitle": "【乐正绫×巴黎欧莱雅】左上右下画个方，一起来跳《小白方》~",
+      "publicationDate": "2021-10-12",
+      "vocalists": [
+        "乐正绫"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 48450,
+      "viewTier": "普通曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/d4695cfeecbdb8f645fd10e8c5b1a406bc62cd8e.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1dT4y1d7Nq/"
+    },
+    {
+      "bvid": "BV1Zs411S7kL",
+      "name": "枯干的画笔",
+      "bilibiliTitle": "《枯干的画笔》钢琴版",
+      "publicationDate": "2015-04-06",
+      "vocalists": [
+        "无"
+      ],
+      "engines": [
+        "无"
+      ],
+      "workType": "纯音乐",
+      "gameRole": "standard",
+      "views": 251134,
+      "viewTier": "殿堂曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/36a6254c8ba042a482cd5a520595850ba1de59e5.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Zs411S7kL/"
+    },
+    {
+      "bvid": "BV1os411U7UV",
+      "name": "零·创世",
+      "bilibiliTitle": "【洛天依原创】《零·创世》【聆语社】【PV付】",
+      "publicationDate": "2015-07-01",
+      "vocalists": [
+        "洛天依"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 30460,
+      "viewTier": "普通曲",
+      "coverUrl": "https://i2.hdslb.com/bfs/archive/6b7c70395fd4da558b1fed3d10f895f96bffbd15.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1os411U7UV/"
+    },
+    {
+      "bvid": "BV1Ks411D7aL",
+      "name": "卡祖笛的悲风",
+      "bilibiliTitle": "卡祖笛原创曲《卡祖笛的悲风》",
+      "publicationDate": "2015-04-12",
+      "vocalists": [
+        "无"
+      ],
+      "engines": [
+        "无"
+      ],
+      "workType": "纯音乐",
+      "gameRole": "standard",
+      "views": 69596,
+      "viewTier": "普通曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/e21286c3263a11fe518f5c42485fc43f864bd7ef.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1Ks411D7aL/"
+    },
+    {
+      "bvid": "av8604995",
+      "name": "告一段落",
+      "bilibiliTitle": "陈一发儿 原创《告一段落》",
+      "publicationDate": "2017-02-14",
+      "vocalists": [
+        "陈一发"
+      ],
+      "engines": [
+        "无"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": null,
+      "viewTier": "专兑曲",
+      "coverUrl": "/og.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/av8604995/"
+    },
+    {
+      "bvid": "av6763718",
+      "name": "魂斗罗",
+      "bilibiliTitle": "《魂斗罗》（原投稿标题未存档）",
+      "publicationDate": "2016-10-21",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": null,
+      "viewTier": "殿堂曲",
+      "coverUrl": "/og.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/av6763718/"
+    },
+    {
+      "bvid": "av1648590",
+      "name": "蓝翔快书",
+      "bilibiliTitle": "洛天依，言和《蓝翔快书》",
+      "publicationDate": "2014-10-24",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 462382,
+      "viewTier": "殿堂曲",
+      "coverUrl": "/og.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/av1648590/"
+    },
+    {
+      "bvid": "BV1RF4m1M7KU",
+      "name": "目标是术力口大师",
+      "bilibiliTitle": "目标是术力口大师！虚拟歌手全员化身神奇宝贝！“训练师”们的大合唱！【2024虚拟歌手贺岁纪单品】",
+      "publicationDate": "2024-02-05",
+      "vocalists": [
+        "多人"
+      ],
+      "engines": [
+        "无"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 184099,
+      "viewTier": "殿堂曲",
+      "coverUrl": "https://i1.hdslb.com/bfs/archive/bc2c062ca6a741fa8ef15a8a98aade4d17dee04f.jpg",
+      "bilibiliUrl": "https://www.bilibili.com/video/BV1RF4m1M7KU/"
+    },
+    {
+      "bvid": "av3905495",
+      "name": "大宅学家",
+      "bilibiliTitle": "〖2016拜年祭单品〗大宅学家",
+      "publicationDate": "2016-02-22",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ],
+      "engines": [
+        "VOCALOID"
+      ],
+      "workType": "歌曲",
+      "gameRole": "standard",
+      "views": 1462639,
+      "viewTier": "传说曲",
+      "coverUrl": "/og.png",
+      "bilibiliUrl": "https://www.bilibili.com/video/av3905495/"
+    }
+  ]
+}

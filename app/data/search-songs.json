@@ -1,0 +1,596 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-08T18:48:52.195Z",
+  "viewsSnapshotDate": "2026-08-09",
+  "itemCount": 70,
+  "items": [
+    {
+      "bvid": "BV1WFjd6BEe2",
+      "name": "Old Sad Song",
+      "publicationDate": "2026-06-24",
+      "vocalists": [
+        "ilem"
+      ]
+    },
+    {
+      "bvid": "BV1Y2oNB1ESs",
+      "name": "告死鸟",
+      "publicationDate": "2026-04-20",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV18sZ7BGEtz",
+      "name": "皆不过",
+      "publicationDate": "2026-02-16",
+      "vocalists": [
+        "李常超"
+      ]
+    },
+    {
+      "bvid": "BV1jN7xzoEp7",
+      "name": "脑壳疼",
+      "publicationDate": "2025-05-31",
+      "vocalists": [
+        "ilem",
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1qZ5SzoE9j",
+      "name": "气球",
+      "publicationDate": "2025-04-27",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV183dpYFERP",
+      "name": "千年醒",
+      "publicationDate": "2025-04-10",
+      "vocalists": [
+        "祖娅纳惜",
+        "CrazyMo救世界"
+      ]
+    },
+    {
+      "bvid": "BV1Dn4y1975A",
+      "name": "床边哲学我",
+      "publicationDate": "2024-06-21",
+      "vocalists": [
+        "林震linz"
+      ]
+    },
+    {
+      "bvid": "BV157421T7Na",
+      "name": "来春打马",
+      "publicationDate": "2024-02-04",
+      "vocalists": [
+        "ilem"
+      ]
+    },
+    {
+      "bvid": "BV1qH4y1X7KZ",
+      "name": "四风判词",
+      "publicationDate": "2023-09-05",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1Xs4y1377m",
+      "name": "大地球歌厅",
+      "publicationDate": "2023-05-06",
+      "vocalists": [
+        "洛天依",
+        "ilem"
+      ]
+    },
+    {
+      "bvid": "BV1bR4y1a7eW",
+      "name": "小孩小孩",
+      "publicationDate": "2023-01-21",
+      "vocalists": [
+        "传说中的刷牙者"
+      ]
+    },
+    {
+      "bvid": "BV1Xe411F7bq",
+      "name": "开心高兴歌",
+      "publicationDate": "2022-12-19",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1za411X7BJ",
+      "name": "大吉",
+      "publicationDate": "2022-07-05",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1wT4y1k7Pw",
+      "name": "白鸟过河滩",
+      "publicationDate": "2022-05-02",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV11L411F7J7",
+      "name": "烟火赴新年",
+      "publicationDate": "2022-01-31",
+      "vocalists": [
+        "咻咻满",
+        "翠花"
+      ]
+    },
+    {
+      "bvid": "BV1WR4y147x4",
+      "name": "我没有歌能给你听",
+      "publicationDate": "2021-11-27",
+      "vocalists": [
+        "洛天依",
+        "乐正绫"
+      ]
+    },
+    {
+      "bvid": "BV1nP4y1W7dr",
+      "name": "石头歌",
+      "publicationDate": "2021-08-08",
+      "vocalists": [
+        "三无Marblue"
+      ]
+    },
+    {
+      "bvid": "BV1Lw411d7vS",
+      "name": "斩草歌",
+      "publicationDate": "2021-07-07",
+      "vocalists": [
+        "萨顶顶"
+      ]
+    },
+    {
+      "bvid": "BV1UA411G7aS",
+      "name": "梦良衣",
+      "publicationDate": "2021-05-11",
+      "vocalists": [
+        "赤羽"
+      ]
+    },
+    {
+      "bvid": "BV17y4y1q7ex",
+      "name": "泥汤",
+      "publicationDate": "2020-12-02",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1p5411879s",
+      "name": "苍蝇",
+      "publicationDate": "2020-08-10",
+      "vocalists": [
+        "赤羽"
+      ]
+    },
+    {
+      "bvid": "BV1oc411h7mR",
+      "name": "看星星",
+      "publicationDate": "2020-04-08",
+      "vocalists": [
+        "星尘",
+        "徵羽摩柯"
+      ]
+    },
+    {
+      "bvid": "BV1zJ411479H",
+      "name": "上山岗",
+      "publicationDate": "2019-12-22",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1x4411K7ck",
+      "name": "保卫罗德岛",
+      "publicationDate": "2019-06-11",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV134411h7XX",
+      "name": "售楼小姐",
+      "publicationDate": "2019-04-26",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV19b41157sK",
+      "name": "威海",
+      "publicationDate": "2019-04-18",
+      "vocalists": [
+        "乐正龙牙"
+      ]
+    },
+    {
+      "bvid": "BV1ab411M7zx",
+      "name": "写给我家狗的歌",
+      "publicationDate": "2019-04-11",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1Zb411j7vb",
+      "name": "得过且过的勇者",
+      "publicationDate": "2019-03-22",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ]
+    },
+    {
+      "bvid": "BV14b411b7Vr",
+      "name": "大氿歌",
+      "publicationDate": "2019-03-01",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1vb411Y7A6",
+      "name": "夜间出租车",
+      "publicationDate": "2019-02-21",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1Jb411U7u2",
+      "name": "勾指起誓",
+      "publicationDate": "2019-02-13",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1Bt411z799",
+      "name": "鸽子",
+      "publicationDate": "2018-12-29",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ]
+    },
+    {
+      "bvid": "BV1rt411f75e",
+      "name": "傲娇系男孩的告白日",
+      "publicationDate": "2018-10-12",
+      "vocalists": [
+        "乐正绫"
+      ]
+    },
+    {
+      "bvid": "BV1xs41137Vm",
+      "name": "〇",
+      "publicationDate": "2018-08-03",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1jp411R7V2",
+      "name": "2014年7月6日完成的纯音乐untitled",
+      "publicationDate": "2018-05-25",
+      "vocalists": [
+        "无"
+      ]
+    },
+    {
+      "bvid": "BV18W411v7Cx",
+      "name": "9Bang15便士",
+      "publicationDate": "2018-01-18",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1sx411x7o4",
+      "name": "欧菲香",
+      "publicationDate": "2017-09-22",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ]
+    },
+    {
+      "bvid": "BV1rx411a7CH",
+      "name": "车",
+      "publicationDate": "2017-06-08",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1rx411D7AB",
+      "name": "上下上下",
+      "publicationDate": "2017-04-19",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1sx411k7ug",
+      "name": "达拉崩吧",
+      "publicationDate": "2017-03-25",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ]
+    },
+    {
+      "bvid": "BV16s411Y7Si",
+      "name": "深夜诗人",
+      "publicationDate": "2016-12-05",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ]
+    },
+    {
+      "bvid": "BV1Zs411r7Rc",
+      "name": "埃及方块",
+      "publicationDate": "2016-08-16",
+      "vocalists": [
+        "洛天依",
+        "言舞"
+      ]
+    },
+    {
+      "bvid": "BV1Qs411y7Ah",
+      "name": "最美的夏天",
+      "publicationDate": "2016-07-16",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1Ys411i7Ea",
+      "name": "尖叫鸭子",
+      "publicationDate": "2016-05-30",
+      "vocalists": [
+        "无"
+      ]
+    },
+    {
+      "bvid": "BV12s411q7Br",
+      "name": "牧星者",
+      "publicationDate": "2016-04-28",
+      "vocalists": [
+        "星尘"
+      ]
+    },
+    {
+      "bvid": "BV1Xs411B7DK",
+      "name": "燕子",
+      "publicationDate": "2016-03-29",
+      "vocalists": [
+        "Rana"
+      ]
+    },
+    {
+      "bvid": "BV1Ys411X7vP",
+      "name": "一人行者",
+      "publicationDate": "2016-01-30",
+      "vocalists": [
+        "心华"
+      ]
+    },
+    {
+      "bvid": "BV1Xs41197Av",
+      "name": "写给我第一个喜欢的女孩的歌",
+      "publicationDate": "2015-12-24",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1Vs411d7iP",
+      "name": "大時代",
+      "searchAliases": [
+        "大时代"
+      ],
+      "publicationDate": "2015-11-07",
+      "vocalists": [
+        "心华",
+        "乐正绫"
+      ]
+    },
+    {
+      "bvid": "BV1Bs41127pL",
+      "name": "今天的诗",
+      "publicationDate": "2015-10-24",
+      "vocalists": [
+        "葛平"
+      ]
+    },
+    {
+      "bvid": "BV15s41127yg",
+      "name": "花儿纳吉",
+      "publicationDate": "2015-10-08",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ]
+    },
+    {
+      "bvid": "BV1ts411S7KC",
+      "name": "葬歌",
+      "publicationDate": "2015-07-22",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ]
+    },
+    {
+      "bvid": "BV1ts411U7DM",
+      "name": "大艺术家",
+      "publicationDate": "2015-06-08",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ]
+    },
+    {
+      "bvid": "BV1rs411D7DJ",
+      "name": "星雨之夜",
+      "publicationDate": "2015-05-05",
+      "vocalists": [
+        "心华"
+      ]
+    },
+    {
+      "bvid": "BV1zs411S7sz",
+      "name": "普通DISCO",
+      "publicationDate": "2015-03-21",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ]
+    },
+    {
+      "bvid": "BV1ex411A7WN",
+      "name": "Song For You",
+      "publicationDate": "2015-02-21",
+      "vocalists": [
+        "言和"
+      ]
+    },
+    {
+      "bvid": "BV1tx411A71m",
+      "name": "阴阳先生",
+      "publicationDate": "2015-02-08",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ]
+    },
+    {
+      "bvid": "BV1Px411A71E",
+      "name": "葛平之歌",
+      "publicationDate": "2015-01-26",
+      "vocalists": [
+        "葛平"
+      ]
+    },
+    {
+      "bvid": "BV1Ux411w7QM",
+      "name": "神经病之歌",
+      "publicationDate": "2014-12-30",
+      "vocalists": [
+        "洛天依",
+        "言和",
+        "初音未来"
+      ]
+    },
+    {
+      "bvid": "BV1Ax411N777",
+      "name": "新贵妃醉酒",
+      "publicationDate": "2014-12-09",
+      "vocalists": [
+        "葛平"
+      ]
+    },
+    {
+      "bvid": "BV1dx411P723",
+      "name": "弗拉门戈之星",
+      "publicationDate": "2014-12-02",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1mx411P7zP",
+      "name": "孤高光棍歌",
+      "publicationDate": "2014-11-11",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ]
+    },
+    {
+      "bvid": "BV1rx411P7HZ",
+      "name": "怪物大暴走",
+      "publicationDate": "2014-11-05",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ]
+    },
+    {
+      "bvid": "BV1Ax411P7Aj",
+      "name": "言氏战鼓",
+      "publicationDate": "2014-10-06",
+      "vocalists": [
+        "言和"
+      ]
+    },
+    {
+      "bvid": "BV1px411K7Zp",
+      "name": "离乡",
+      "publicationDate": "2014-09-13",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1Jx411K7yY",
+      "name": "僵尸舞",
+      "publicationDate": "2014-08-31",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ]
+    },
+    {
+      "bvid": "BV1ux411K7A4",
+      "name": "最忆江南",
+      "publicationDate": "2014-08-22",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ]
+    },
+    {
+      "bvid": "BV1dx411N7W9",
+      "name": "今天没吃药",
+      "publicationDate": "2014-08-19",
+      "vocalists": [
+        "洛天依",
+        "言和"
+      ]
+    },
+    {
+      "bvid": "BV1Fx411K7aC",
+      "name": "一样",
+      "publicationDate": "2014-08-16",
+      "vocalists": [
+        "洛天依"
+      ]
+    },
+    {
+      "bvid": "BV1Qx411N7um",
+      "name": "4分钟！教你制作一段音乐",
+      "publicationDate": "2014-08-08",
+      "vocalists": [
+        "无"
+      ]
+    }
+  ]
+}

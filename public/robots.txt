@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /pk/ws
+
+Sitemap: https://aiyiba.getuphole.top/sitemap.xml

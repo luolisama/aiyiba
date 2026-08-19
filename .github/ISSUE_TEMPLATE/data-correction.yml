@@ -1,0 +1,32 @@
+name: 数据纠错
+description: 反馈题库中的作品名、演唱、引擎、日期或等级问题
+title: "[数据] "
+body:
+  - type: input
+    attributes:
+      label: 作品名
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: BV/AV 号
+      description: 删除投稿可以填写原链接或“已删除”。
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: 错误字段
+      placeholder: 例如演唱、引擎、投稿日期、播放等级
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 当前值与建议值
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 可复核来源
+      description: 请提供链接、截图来源、作者说明或历史快照，并注明核对日期。
+    validations:
+      required: true

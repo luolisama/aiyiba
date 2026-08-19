@@ -1,0 +1,50 @@
+{
+  "name": "aiyiba",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "vinext dev",
+    "data:clue-index": "node scripts/build-clue-search-index.mjs",
+    "pk:server": "node server/pk-server.mjs",
+    "build": "vinext build",
+    "start": "vinext start",
+    "test:e2e": "node scripts/run-e2e.mjs",
+    "test": "npm run build && node --test tests/architecture.test.mjs tests/game-logic.test.mjs tests/catalog.test.mjs tests/share-card-model.test.mjs tests/request-rate-limiter.test.mjs tests/pk-client-logic.test.mjs tests/pk-game.test.mjs tests/pk-server.test.mjs tests/singleplayer-game.test.mjs tests/singleplayer-api.test.mjs tests/clue-game.test.mjs tests/clue-client-logic.test.mjs tests/clue-api.test.mjs tests/timeline-game.test.mjs tests/timeline-api.test.mjs",
+    "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "typecheck": "tsc --noEmit --incremental false",
+    "verify": "npm run typecheck && npm run lint && npm test && npm run test:e2e"
+  },
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "ws": "8.21.3"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.51.1",
+    "@eslint/js": "9.39.4",
+    "@next/eslint-plugin-next": "16.2.6",
+    "@playwright/test": "1.62.1",
+    "@tailwindcss/postcss": "4.2.1",
+    "@types/node": "22.19.19",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.2",
+    "@vitejs/plugin-rsc": "0.5.26",
+    "eslint": "9.39.4",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "16.4.0",
+    "react-server-dom-webpack": "19.2.8",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.59.3",
+    "vinext": "1.0.0-beta.5",
+    "vite": "8.2.1",
+    "wrangler": "^4.120.0"
+  },
+  "type": "module"
+}

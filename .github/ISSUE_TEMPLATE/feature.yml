@@ -1,0 +1,20 @@
+name: 玩法与功能建议
+description: 提议新的玩法、交互或项目改进
+title: "[建议] "
+body:
+  - type: textarea
+    attributes:
+      label: 想解决的问题
+      description: 先说明当前体验哪里不足。
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 建议方案
+      description: 请尽量说明核心规则、操作流程和胜负条件。
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: 移动端体验
+      description: 如果涉及新界面，请说明窄屏下如何操作。
