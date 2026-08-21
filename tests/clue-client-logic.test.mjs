@@ -47,7 +47,7 @@ test("clue share includes revealed values, attempts, and the answer", () => {
   assert.match(text, /答案：达拉崩吧/);
 });
 
-test("browser clue search indexes contain no answer metadata", () => {
+test("browser clue search indexes contain only reduced search metadata", () => {
   assert.equal(normalIndex.itemCount, 70);
   assert.equal(extendedIndex.itemCount, 81);
   for (const song of [...normalIndex.items, ...extendedIndex.items]) {

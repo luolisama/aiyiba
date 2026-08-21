@@ -40,7 +40,7 @@ test("catalogs contain unique, structurally valid songs and the extended catalog
   assert.ok(extendedCatalog.items.some((song) => typeof song.views === "number" && song.views < 100_000));
 });
 
-test("search indexes and pinyin maps cover each catalog without answer metadata", () => {
+test("search indexes and pinyin maps cover each catalog with reduced search metadata", () => {
   for (const [full, reduced, pinyin] of [
     [catalog, searchCatalog, songPinyin],
     [extendedCatalog, extendedSearchCatalog, extendedPinyin],

@@ -2,11 +2,17 @@
 
 import Link from "next/link";
 import RulesDialog from "../rules-dialog";
-import { isRoundInvalidatedError, ROUND_INVALIDATED_MESSAGE } from "../round-errors.mjs";
 import { useCallback, useEffect, useState } from "react";
 import searchSongsJson from "../data/search-songs.json";
 import hardcoreSearchSongsJson from "../data/hardcore-search-songs.json";
+import songsJson from "../data/songs.json";
+import hardcoreSongsJson from "../data/hardcore-songs.json";
 import CatalogSelector from "../catalog-selector";
+import {
+  createTimelineRound,
+  placeTimeline,
+  restoreTimelineRound,
+} from "../local-game-engine.mjs";
 
 type PoolName = "normal" | "hardcore";
 const POOL_COUNTS: Record<PoolName, number> = {
@@ -39,8 +45,10 @@ type PlacementResult = {
   song: TimelineSong;
 };
 type TimelineState = {
+  schemaVersion: number;
   roundId: string;
   pool: PoolName;
+  targetBvids: string[];
   maxPlacements: number;
   placements: Placement[];
   score: number;
@@ -51,8 +59,12 @@ type TimelineState = {
 };
 
 const GAME_STORAGE_KEY = "aiyiba-timeline-game-v1";
+const LOCAL_GAME_STORAGE_KEY = "aiyiba-timeline-game-v2";
+const POOLS = {
+  normal: songsJson.items,
+  hardcore: hardcoreSongsJson.items,
+} as const;
 const RULES_STORAGE_KEY = "aiyiba-timeline-rules-seen-v1";
-const CLIENT_STORAGE_KEY = "aiyiba-singleplayer-client-v1";
 
 function poolFromLocation(): PoolName {
   if (typeof window === "undefined") return "normal";
@@ -64,10 +76,6 @@ function poolLabel(pool: PoolName) {
   return pool === "hardcore" ? "扩展题库" : "标准题库";
 }
 
-function apiPool(pool: PoolName) {
-  return pool === "hardcore" ? "extended" : "normal";
-}
-
 function updateCatalogUrl(pool: PoolName) {
   const url = new URL(window.location.href);
   if (pool === "hardcore") url.searchParams.set("catalog", "extended");
@@ -75,20 +83,17 @@ function updateCatalogUrl(pool: PoolName) {
   window.history.replaceState(null, "", `${url.pathname}${url.search}`);
 }
 
-function readClientId() {
-  try {
-    const saved = localStorage.getItem(CLIENT_STORAGE_KEY)?.trim();
-    if (saved) return saved;
-    const created = globalThis.crypto?.randomUUID?.() ?? `timeline-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    localStorage.setItem(CLIENT_STORAGE_KEY, created);
-    return created;
-  } catch {
-    return `timeline-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  }
-}
-
 function writeGame(state: TimelineState) {
-  try { localStorage.setItem(GAME_STORAGE_KEY, JSON.stringify({ roundId: state.roundId, pool: state.pool })); }
+  try {
+    const safe = {
+      ...state,
+      timeline: state.timeline.map((song) => song.bvid),
+      target: null,
+      lastPlacement: undefined,
+    };
+    localStorage.setItem(LOCAL_GAME_STORAGE_KEY, JSON.stringify(safe));
+    localStorage.removeItem(GAME_STORAGE_KEY);
+  }
   catch { /* storage is optional */ }
 }
 
@@ -104,25 +109,6 @@ function formatSlotRange(start?: number, end?: number) {
   return first === last ? `第 ${first} 个空位` : `第 ${first}–${last} 个空位`;
 }
 
-async function timelineRequest(message: Record<string, unknown>) {
-  const response = await fetch("/api/timeline", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    cache: "no-store",
-    body: JSON.stringify(message),
-  });
-  let body: { state?: TimelineState; error?: string; code?: string } = {};
-  try { body = await response.json() as typeof body; } catch { /* handled below */ }
-  if (!response.ok) {
-    const error = new Error(body.error ?? "时光机暂时无法启动");
-    (error as Error & { status?: number; code?: string }).status = response.status;
-    (error as Error & { status?: number; code?: string }).code = body.code;
-    throw error;
-  }
-  if (!body.state) throw new Error("时光机没有返回题目");
-  return body.state;
-}
-
 export default function TimelinePage() {
   const [pool, setPool] = useState<PoolName>(poolFromLocation);
   const [game, setGame] = useState<TimelineState | null>(null);
@@ -131,10 +117,10 @@ export default function TimelinePage() {
   const [toast, setToast] = useState("");
   const [showRules, setShowRules] = useState(false);
 
-  const startRound = useCallback(async (targetPool: PoolName) => {
+  const startRound = useCallback((targetPool: PoolName) => {
     setBusy(true);
     try {
-      const state = await timelineRequest({ action: "start", pool: apiPool(targetPool), clientId: readClientId() });
+      const state = createTimelineRound({ pool: targetPool, songs: POOLS[targetPool] }) as TimelineState;
       setPool(targetPool);
       setGame(state);
       writeGame(state);
@@ -143,7 +129,7 @@ export default function TimelinePage() {
       setToast("");
       return true;
     } catch (error) {
-      setLoadError(error instanceof Error ? error.message : "时光机暂时无法启动");
+      setLoadError(error instanceof Error ? error.message : "暂时无法开始时光机");
       return false;
     } finally {
       setBusy(false);
@@ -153,23 +139,27 @@ export default function TimelinePage() {
   useEffect(() => {
     let cancelled = false;
     const frame = window.requestAnimationFrame(() => {
-      void (async () => {
+      void (() => {
         const requestedPool = poolFromLocation();
-        let state: TimelineState | undefined;
+        const songs = POOLS[requestedPool];
+        let stored: Partial<TimelineState> | null = null;
         try {
-          const stored = JSON.parse(localStorage.getItem(GAME_STORAGE_KEY) ?? "null") as { roundId?: string; pool?: PoolName } | null;
-          if (stored?.roundId && stored.pool === requestedPool) {
-            try { state = await timelineRequest({ action: "resume", roundId: stored.roundId }); } catch { state = undefined; }
-          }
-          if (!state) state = await timelineRequest({ action: "start", pool: apiPool(requestedPool), clientId: readClientId() });
-          if (cancelled) return;
-          setGame(state);
-          setPool(state.pool);
-          writeGame(state);
-          setLoadError("");
-        } catch (error) {
-          if (!cancelled) setLoadError(error instanceof Error ? error.message : "时光机暂时无法启动");
+          const raw = localStorage.getItem(LOCAL_GAME_STORAGE_KEY) ?? localStorage.getItem(GAME_STORAGE_KEY);
+          stored = raw ? JSON.parse(raw) as Partial<TimelineState> : null;
+        } catch {
+          stored = null;
         }
+        const restored = restoreTimelineRound(stored, songs, requestedPool);
+        const state = (restored ?? createTimelineRound({ pool: requestedPool, songs })) as TimelineState;
+        if (cancelled) return;
+        if (!restored && stored) {
+          setToast("玩法已更新，旧本局无法恢复，已重新抽取题目");
+          window.setTimeout(() => setToast(""), 2800);
+        }
+        setGame(state);
+        setPool(state.pool);
+        writeGame(state);
+        setLoadError("");
         try {
           if (localStorage.getItem(RULES_STORAGE_KEY) !== "seen") setShowRules(true);
         } catch { setShowRules(true); }
@@ -178,21 +168,16 @@ export default function TimelinePage() {
     return () => { cancelled = true; window.cancelAnimationFrame(frame); };
   }, []);
 
-  async function place(slot: number) {
+  function place(slot: number) {
     if (!game || game.finished || busy) return;
     setBusy(true);
     try {
-      const state = await timelineRequest({ action: "place", roundId: game.roundId, slot });
+      const state = placeTimeline(game, POOLS[pool], slot) as TimelineState;
       setGame(state);
       writeGame(state);
       setToast(state.lastPlacement?.correct ? "放对了！" : `差一点，正确日期是 ${formatDate(state.lastPlacement?.song.publicationDate ?? "")}`);
       window.setTimeout(() => setToast(""), 2600);
     } catch (error) {
-      if (isRoundInvalidatedError(error)) {
-        setGame(null);
-        setLoadError(ROUND_INVALIDATED_MESSAGE);
-        return;
-      }
       setToast(error instanceof Error ? error.message : "放置失败，请重试");
       window.setTimeout(() => setToast(""), 2400);
     } finally {
@@ -221,7 +206,7 @@ export default function TimelinePage() {
   function changeCatalog(targetPool: PoolName) {
     if (locked || busy || targetPool === pool) return;
     void (async () => {
-      const changed = await startRound(targetPool);
+      const changed = startRound(targetPool);
       if (!changed) return;
       setToast(`已切换至${poolLabel(targetPool)}，本局题目已重新抽取`);
       window.setTimeout(() => setToast(""), 2600);

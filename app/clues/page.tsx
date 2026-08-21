@@ -7,19 +7,40 @@ import clueSearchJson from "../data/clue-search-songs.json";
 import hardcoreClueSearchJson from "../data/hardcore-clue-search-songs.json";
 import hardcoreSongPinyinJson from "../data/hardcore-song-pinyin.json";
 import songPinyinJson from "../data/song-pinyin.json";
+import songsJson from "../data/songs.json";
+import hardcoreSongsJson from "../data/hardcore-songs.json";
 import { matchesSongQuery, normalizeSearchText } from "../game-logic.mjs";
 import { isExtendedOnlySong } from "../catalog-logic.mjs";
 import ShareImageDialog from "../share-image-dialog";
 import RulesDialog from "../rules-dialog";
-import { isRoundInvalidatedError, ROUND_INVALIDATED_MESSAGE } from "../round-errors.mjs";
 import type { ShareCardModel } from "../share-card";
 import { buildClueShareCardModel } from "../share-card-model.mjs";
 import { normalizeClueStats, recordClueResult, resetCluePoolStats } from "./client-logic.mjs";
 import CatalogSelector from "../catalog-selector";
+import {
+  actClue,
+  createClueRound,
+  readLocalShoe,
+  restoreClueRound,
+  surrenderClue,
+} from "../local-game-engine.mjs";
 
 type PoolName = "normal" | "hardcore";
 type FinishReason = "guessed" | "attempts" | "surrender" | null;
-type SearchSong = { bvid: string; name: string; searchAliases?: string[]; searchPinyin?: string[] };
+type Song = {
+  bvid: string;
+  name: string;
+  bilibiliTitle: string;
+  publicationDate: string;
+  vocalists: string[];
+  engines: string[];
+  views: number | null;
+  viewTier: string;
+  coverUrl: string;
+  bilibiliUrl: string;
+  searchAliases?: string[];
+  searchPinyin?: string[];
+};
 type Clue = { key: string; label: string; value: string };
 type ClueAction = { type: "guess" | "skip"; attempt: number; bvid?: string; name?: string; correct: boolean };
 type Answer = {
@@ -34,8 +55,10 @@ type Answer = {
   bilibiliUrl: string;
 };
 type GameState = {
+  schemaVersion: number;
   roundId: string;
   pool: PoolName;
+  answerBvid: string;
   maxAttempts?: number;
   clueCount?: number;
   clues: Clue[];
@@ -51,24 +74,26 @@ type PoolStats = { played: number; wins: number; bestStep: number; totalWinningS
 type ClueStats = { schemaVersion: number; pools: Record<PoolName, PoolStats>; recordedRoundIds: string[] };
 
 const GAME_STORAGE_KEY = "aiyiba-clues-game-v1";
+const LOCAL_GAME_STORAGE_KEY = "aiyiba-clues-game-v2";
+const SHOE_STORAGE_KEYS: Record<PoolName, string> = { normal: "aiyiba-clues-shoe-v2-normal", hardcore: "aiyiba-clues-shoe-v2-hardcore" };
 const STATS_STORAGE_KEY = "aiyiba-clues-stats-v1";
 const RULES_STORAGE_KEY = "aiyiba-clues-rules-seen-v1";
-const CLIENT_STORAGE_KEY = "aiyiba-singleplayer-client-v1";
-
-const POOLS: Record<PoolName, { items: SearchSong[]; itemCount: number }> = {
+const POOLS: Record<PoolName, { items: Song[]; itemCount: number }> = {
   normal: {
     itemCount: clueSearchJson.itemCount,
     items: clueSearchJson.items.map((song) => ({
+      ...songsJson.items.find((candidate) => candidate.bvid === song.bvid),
       ...song,
       searchPinyin: [songPinyinJson[song.bvid as keyof typeof songPinyinJson]].filter(Boolean),
-    })),
+    })) as Song[],
   },
   hardcore: {
     itemCount: hardcoreClueSearchJson.itemCount,
     items: hardcoreClueSearchJson.items.map((song) => ({
+      ...hardcoreSongsJson.items.find((candidate) => candidate.bvid === song.bvid),
       ...song,
       searchPinyin: [hardcoreSongPinyinJson[song.bvid as keyof typeof hardcoreSongPinyinJson]].filter(Boolean),
-    })),
+    })) as Song[],
   },
 };
 const STANDARD_BVIDS = new Set(POOLS.normal.items.map((song) => song.bvid));
@@ -83,10 +108,6 @@ function poolLabel(pool: PoolName) {
   return pool === "hardcore" ? "扩展题库" : "标准题库";
 }
 
-function apiPool(pool: PoolName) {
-  return pool === "hardcore" ? "extended" : "normal";
-}
-
 function updateCatalogUrl(pool: PoolName) {
   const url = new URL(window.location.href);
   if (pool === "hardcore") url.searchParams.set("catalog", "extended");
@@ -94,47 +115,23 @@ function updateCatalogUrl(pool: PoolName) {
   window.history.replaceState(null, "", `${url.pathname}${url.search}`);
 }
 
-function clientId() {
+function writeGame(state: GameState) {
   try {
-    const saved = localStorage.getItem(CLIENT_STORAGE_KEY)?.trim();
-    if (saved) return saved;
-    const created = globalThis.crypto?.randomUUID?.() ?? `clue-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    localStorage.setItem(CLIENT_STORAGE_KEY, created);
-    return created;
-  } catch {
-    return `clue-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  }
-}
-
-async function clueRequest(message: Record<string, unknown>) {
-  const response = await fetch("/api/clues", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    cache: "no-store",
-    body: JSON.stringify(message),
-  });
-  let body: { state?: GameState; error?: string; code?: string } = {};
-  try { body = await response.json() as typeof body; } catch { /* handled below */ }
-  if (!response.ok) {
-    const error = new Error(body.error ?? "线索服务暂时不可用");
-    (error as Error & { status?: number; code?: string }).status = response.status;
-    (error as Error & { status?: number; code?: string }).code = body.code;
-    throw error;
-  }
-  return body.state;
+    const safe: Record<string, unknown> = { ...state };
+    delete safe.answer;
+    safe.clues = [];
+    safe.actions = state.actions.map((action) => ({
+      type: action.type,
+      ...(action.bvid ? { bvid: action.bvid } : {}),
+    }));
+    localStorage.setItem(LOCAL_GAME_STORAGE_KEY, JSON.stringify(safe));
+    localStorage.removeItem(GAME_STORAGE_KEY);
+  } catch { /* storage is optional */ }
 }
 
 function readStats(): ClueStats {
   try { return normalizeClueStats(JSON.parse(localStorage.getItem(STATS_STORAGE_KEY) ?? "null")) as ClueStats; }
   catch { return normalizeClueStats() as ClueStats; }
-}
-
-function writeGame(state: GameState) {
-  try {
-    const safe = { ...state };
-    delete safe.answer;
-    localStorage.setItem(GAME_STORAGE_KEY, JSON.stringify(safe));
-  } catch { /* storage is optional */ }
 }
 
 function formatDate(value: string) {
@@ -176,11 +173,19 @@ export default function ClueLadderPage() {
     setStats(next);
   }, []);
 
-  const startRound = useCallback(async (targetPool: PoolName) => {
+  const startRound = useCallback((targetPool: PoolName) => {
     setBusy(true);
     try {
-      const state = await clueRequest({ action: "start", pool: apiPool(targetPool), clientId: clientId() });
-      if (!state) throw new Error("线索服务没有返回题目");
+      const target = POOLS[targetPool];
+      let savedShoe: string | null = null;
+      try { savedShoe = localStorage.getItem(SHOE_STORAGE_KEYS[targetPool]); } catch { /* storage is optional */ }
+      const created = createClueRound({
+        pool: targetPool,
+        songs: target.items,
+        shoe: readLocalShoe(savedShoe, target.items.map((song) => song.bvid)),
+      });
+      const state = created.state as GameState;
+      try { localStorage.setItem(SHOE_STORAGE_KEYS[targetPool], JSON.stringify(created.shoe)); } catch { /* optional */ }
       setPool(targetPool);
       setGame(state);
       writeGame(state);
@@ -192,7 +197,7 @@ export default function ClueLadderPage() {
       setLoadError("");
       return true;
     } catch (error) {
-      setLoadError(error instanceof Error ? error.message : "线索服务暂时不可用");
+      setLoadError(error instanceof Error ? error.message : "暂时无法开始新一局");
       return false;
     } finally {
       setBusy(false);
@@ -202,29 +207,45 @@ export default function ClueLadderPage() {
   useEffect(() => {
     let cancelled = false;
     const frame = window.requestAnimationFrame(() => {
-      void (async () => {
+      void (() => {
         setStats(readStats());
         const requestedPool = poolFromLocation();
-        let state: GameState | undefined;
+        const songs = POOLS[requestedPool].items;
+        let stored: Partial<GameState> | null = null;
         try {
-          const stored = JSON.parse(localStorage.getItem(GAME_STORAGE_KEY) ?? "null") as Partial<GameState> | null;
-          if (stored?.roundId && stored.pool === requestedPool) {
-            try { state = await clueRequest({ action: "resume", roundId: stored.roundId }); } catch { state = undefined; }
-          }
-          if (!state) state = await clueRequest({ action: "start", pool: apiPool(requestedPool), clientId: clientId() });
-          if (!state) throw new Error("线索服务没有返回题目");
-          if (cancelled) return;
-          setGame(state);
-          writeGame(state);
-          setPool(state.pool);
-          if (state.finished) {
-            saveFinishedResult(state);
-            setShowResult(true);
-          }
-          setLoadError("");
-        } catch (error) {
-          if (!cancelled) setLoadError(error instanceof Error ? error.message : "线索服务暂时不可用");
+          const raw = localStorage.getItem(LOCAL_GAME_STORAGE_KEY) ?? localStorage.getItem(GAME_STORAGE_KEY);
+          stored = raw ? JSON.parse(raw) as Partial<GameState> : null;
+        } catch {
+          stored = null;
         }
+        const restored = restoreClueRound(stored, songs, requestedPool);
+        let state: GameState;
+        if (restored) {
+          state = restored as GameState;
+        } else {
+          let savedShoe: string | null = null;
+          try { savedShoe = localStorage.getItem(SHOE_STORAGE_KEYS[requestedPool]); } catch { /* optional */ }
+          const created = createClueRound({
+            pool: requestedPool,
+            songs,
+            shoe: readLocalShoe(savedShoe, songs.map((song) => song.bvid)),
+          });
+          state = created.state as GameState;
+          try { localStorage.setItem(SHOE_STORAGE_KEYS[requestedPool], JSON.stringify(created.shoe)); } catch { /* optional */ }
+          if (stored) {
+            setToast("玩法已更新，旧本局无法恢复，已重新抽取题目");
+            window.setTimeout(() => setToast(""), 2800);
+          }
+        }
+        if (cancelled) return;
+        setGame(state);
+        writeGame(state);
+        setPool(state.pool);
+        if (state.finished) {
+          saveFinishedResult(state);
+          setShowResult(true);
+        }
+        setLoadError("");
         try {
           if (localStorage.getItem(RULES_STORAGE_KEY) !== "seen") setShowRules(true);
         } catch { setShowRules(true); }
@@ -252,8 +273,8 @@ export default function ClueLadderPage() {
 
   function changeCatalog(targetPool: PoolName) {
     if (locked || busy || targetPool === pool) return;
-    void (async () => {
-      const changed = await startRound(targetPool);
+    void (() => {
+      const changed = startRound(targetPool);
       if (!changed) return;
       setToast(`已切换至${poolLabel(targetPool)}，本局题目已重新抽取`);
       window.setTimeout(() => setToast(""), 2600);
@@ -263,12 +284,11 @@ export default function ClueLadderPage() {
   const winRate = activeStats.played ? Math.round(activeStats.wins / activeStats.played * 100) : 0;
   const averageStep = activeStats.wins ? (activeStats.totalWinningSteps / activeStats.wins).toFixed(1) : "—";
 
-  async function perform(action: "guess" | "skip", bvid?: string) {
+  function perform(action: "guess" | "skip", bvid?: string) {
     if (!game || game.finished || busy) return;
     setBusy(true);
     try {
-      const state = await clueRequest({ action, roundId: game.roundId, bvid });
-      if (!state) throw new Error("线索服务没有返回结果");
+      const state = actClue(game, POOLS[pool].items, action, bvid) as GameState;
       setGame(state);
       writeGame(state);
       setQuery("");
@@ -279,11 +299,6 @@ export default function ClueLadderPage() {
         window.setTimeout(() => setShowResult(true), 280);
       }
     } catch (error) {
-      if (isRoundInvalidatedError(error)) {
-        setGame(null);
-        setLoadError(ROUND_INVALIDATED_MESSAGE);
-        return;
-      }
       setToast(error instanceof Error ? error.message : "操作失败，请重试");
       window.setTimeout(() => setToast(""), 2400);
     } finally {
@@ -291,24 +306,17 @@ export default function ClueLadderPage() {
     }
   }
 
-  async function surrender() {
+  function surrender() {
     if (!game || game.finished || busy) return;
     setBusy(true);
     try {
-      const state = await clueRequest({ action: "surrender", roundId: game.roundId });
-      if (!state) throw new Error("线索服务没有返回结果");
+      const state = surrenderClue(game, POOLS[pool].items) as GameState;
       setGame(state);
       writeGame(state);
       saveFinishedResult(state);
       setShowSurrender(false);
       setShowResult(true);
     } catch (error) {
-      if (isRoundInvalidatedError(error)) {
-        setGame(null);
-        setLoadError(ROUND_INVALIDATED_MESSAGE);
-        setShowSurrender(false);
-        return;
-      }
       setToast(error instanceof Error ? error.message : "操作失败，请重试");
     } finally { setBusy(false); }
   }
@@ -323,15 +331,11 @@ export default function ClueLadderPage() {
     setShareCard(buildClueShareCardModel({ poolLabel: poolLabel(pool), state: game }) as ShareCardModel);
   }
 
-  async function resetLocalRecord() {
+  function resetLocalRecord() {
     if (!window.confirm(`清除${poolLabel(pool)}的本机战绩和抽题历史？当前这一局会保留。`)) return;
     const next = resetCluePoolStats(readStats(), pool) as ClueStats;
     try { localStorage.setItem(STATS_STORAGE_KEY, JSON.stringify(next)); } catch { /* storage is optional */ }
-    try {
-      await clueRequest({ action: "reset-pool", pool: apiPool(pool), clientId: clientId() });
-    } catch {
-      // Local statistics can still be cleared if the server is temporarily unavailable.
-    }
+    try { localStorage.removeItem(SHOE_STORAGE_KEYS[pool]); } catch { /* optional */ }
     setStats(next);
     setShowStats(false);
     setToast("本机记录已清除");

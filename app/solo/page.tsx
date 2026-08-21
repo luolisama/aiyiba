@@ -6,11 +6,12 @@ import searchSongsJson from "../data/search-songs.json";
 import songPinyinJson from "../data/song-pinyin.json";
 import hardcoreSearchSongsJson from "../data/hardcore-search-songs.json";
 import hardcoreSongPinyinJson from "../data/hardcore-song-pinyin.json";
+import songsJson from "../data/songs.json";
+import hardcoreSongsJson from "../data/hardcore-songs.json";
 import ShareImageDialog from "../share-image-dialog";
 import type { ShareCardModel } from "../share-card";
 import { isExtendedOnlySong } from "../catalog-logic.mjs";
 import { buildSingleShareCardModel } from "../share-card-model.mjs";
-import { isRoundInvalidatedError, ROUND_INVALIDATED_MESSAGE } from "../round-errors.mjs";
 import CatalogSelector from "../catalog-selector";
 import {
   addModeResult,
@@ -21,6 +22,13 @@ import {
   normalizeModeStats,
   normalizeSearchText,
 } from "../game-logic.mjs";
+import {
+  createClassicRound,
+  guessClassic,
+  readLocalShoe,
+  restoreClassicRound,
+  surrenderClassic,
+} from "../local-game-engine.mjs";
 
 type Song = {
   bvid: string;
@@ -43,7 +51,7 @@ type SongCatalog = {
   generatedAt: string;
   viewsSnapshotDate: string;
   itemCount: number;
-  items: SearchSong[];
+  items: Song[];
 };
 type SearchSong = Pick<Song, "bvid" | "name" | "publicationDate" | "vocalists"> & {
   searchAliases?: string[];
@@ -61,11 +69,13 @@ type GuessRow = {
   cells: CellResult[];
 };
 type GameState = {
-  schemaVersion: 4;
+  schemaVersion: 5;
   roundId: string;
   pool: PoolName;
   mode: GameMode;
   maxGuesses: number;
+  answerBvid: string;
+  guessBvids: string[];
   guesses: GuessRow[];
   finished: boolean;
   won: boolean;
@@ -85,6 +95,7 @@ type Stats = {
 type StatsByMode = Record<GameMode, Stats>;
 type PoolStorage = {
   gameKey: string;
+  shoeKey: string;
   legacyGameKeys: string[];
   statsKey: string;
   legacyStatsKeys: string[];
@@ -93,28 +104,33 @@ type PoolStorage = {
 };
 type SongPool = {
   catalog: SongCatalog;
-  songs: SearchSong[];
+  songs: Song[];
   storage: PoolStorage;
 };
 
 function createPool(
-  catalog: SongCatalog,
+  searchCatalog: { itemCount: number; items: SearchSong[] },
   pinyinByBvid: Record<string, string>,
+  catalog: SongCatalog,
   storage: PoolStorage,
 ): SongPool {
-  const songs = catalog.items.map((song) => ({
+  const fullByBvid = new Map(catalog.items.map((song) => [song.bvid, song]));
+  const songs = searchCatalog.items.map((song) => ({
+    ...fullByBvid.get(song.bvid),
     ...song,
     searchPinyin: [pinyinByBvid[song.bvid]].filter(Boolean),
-  }));
+  })) as Song[];
   return { catalog, songs, storage };
 }
 
 const NORMAL_POOL = createPool(
   searchSongsJson as SongCatalog,
   songPinyinJson as Record<string, string>,
+  songsJson as SongCatalog,
   {
-    gameKey: "aiyiba-game-v3",
-    legacyGameKeys: ["aiyiba-game-v2", "aiyiba-game-v1"],
+    gameKey: "aiyiba-game-v4",
+    shoeKey: "aiyiba-solo-shoe-v3-normal",
+    legacyGameKeys: ["aiyiba-game-v3", "aiyiba-game-v2", "aiyiba-game-v1"],
     statsKey: "aiyiba-stats-v2",
     legacyStatsKeys: ["aiyiba-stats-v1"],
     rulesKey: "aiyiba-rules-seen-v1",
@@ -124,9 +140,11 @@ const NORMAL_POOL = createPool(
 const HARDCORE_POOL = createPool(
   hardcoreSearchSongsJson as SongCatalog,
   hardcoreSongPinyinJson as Record<string, string>,
+  hardcoreSongsJson as SongCatalog,
   {
-    gameKey: "aiyiba-hardcore-game-v1",
-    legacyGameKeys: [],
+    gameKey: "aiyiba-hardcore-game-v2",
+    shoeKey: "aiyiba-solo-shoe-v3-hardcore",
+    legacyGameKeys: ["aiyiba-hardcore-game-v1"],
     statsKey: "aiyiba-hardcore-stats-v1",
     legacyStatsKeys: [],
     // The first-use guide belongs to the game, rather than to a specific catalog.
@@ -216,46 +234,10 @@ function hasSeenRules(storage: PoolStorage) {
   }
 }
 
-const SINGLEPLAYER_CLIENT_ID_KEY = "aiyiba-singleplayer-client-v1";
-
-function readSinglePlayerClientId() {
-  try {
-    const existing = localStorage.getItem(SINGLEPLAYER_CLIENT_ID_KEY)?.trim();
-    if (existing) return existing;
-    const created = globalThis.crypto?.randomUUID?.() ?? `single-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    localStorage.setItem(SINGLEPLAYER_CLIENT_ID_KEY, created);
-    return created;
-  } catch {
-    return `single-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  }
-}
-
-async function singlePlayerRequest(message: Record<string, unknown>) {
-  const response = await fetch("/api/singleplayer", {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    cache: "no-store",
-    body: JSON.stringify(message),
-  });
-  let body: { state?: GameState; result?: GuessRow; error?: string; code?: string } = {};
-  try {
-    body = await response.json() as typeof body;
-  } catch {
-    // Keep the network error below useful even when the server returned HTML.
-  }
-  if (!response.ok) {
-    const error = new Error(body.error ?? "题目服务暂时不可用");
-    (error as Error & { status?: number; code?: string }).status = response.status;
-    (error as Error & { status?: number; code?: string }).code = body.code;
-    throw error;
-  }
-  if (!body.state && message.action !== "reset-pool") throw new Error("题目服务返回了无效结果");
-  return body;
-}
-
 function persistStoredGame(key: string, value: GameState) {
-  const safeValue = { ...value };
+  const safeValue: Record<string, unknown> = { ...value };
   delete safeValue.answer;
+  delete safeValue.guesses;
   writeLocalStorage(key, JSON.stringify(safeValue));
 }
 
@@ -271,10 +253,6 @@ function poolFor(poolName: PoolName) {
 
 function poolLabel(poolName: PoolName) {
   return poolName === "hardcore" ? "扩展题库" : "标准题库";
-}
-
-function apiPoolName(poolName: PoolName) {
-  return poolName === "hardcore" ? "extended" : "normal";
 }
 
 function replaceCatalogInUrl(poolName: PoolName) {
@@ -313,7 +291,7 @@ export function SinglePlayerPage() {
   useEffect(() => {
     let cancelled = false;
     const frame = window.requestAnimationFrame(() => {
-      void (async () => {
+      void (() => {
         const requestedRules = new URLSearchParams(window.location.search).get("rules") === "1";
         if (requestedRules) {
           window.location.replace("/#rules-modal");
@@ -322,63 +300,56 @@ export function SinglePlayerPage() {
         let restoredStats = loadStats(storage.statsKey, storage.legacyStatsKeys);
         if (cancelled) return;
         setStats(restoredStats);
-        const clientId = readSinglePlayerClientId();
-        let storedRoundId = "";
         let storedMode: GameMode = "normal";
-        let storedStatsRecorded = false;
+        let stored: Partial<GameState> | null = null;
         try {
-          const raw = localStorage.getItem(storage.gameKey);
-          const candidate = raw ? JSON.parse(raw) as Partial<GameState> : null;
-          if (candidate?.schemaVersion === 4 && typeof candidate.roundId === "string") {
-            storedRoundId = candidate.roundId;
-            storedMode = candidate.mode === "hard" ? "hard" : "normal";
-            storedStatsRecorded = candidate.statsRecorded === true;
-          } else {
-            removeLocalStorage(storage.gameKey);
-          }
+          const raw = [storage.gameKey, ...storage.legacyGameKeys]
+            .map((key) => localStorage.getItem(key))
+            .find(Boolean);
+          stored = raw ? JSON.parse(raw) as Partial<GameState> : null;
+          storedMode = stored?.mode === "hard" ? "hard" : "normal";
         } catch {
-          storedRoundId = "";
-          removeLocalStorage(storage.gameKey);
+          stored = null;
         }
-        removeLocalStorage(poolName === "hardcore" ? "aiyiba-hardcore-shoe-v1" : "aiyiba-shoe-v2");
-
-        try {
-          let state: GameState | undefined;
-          if (storedRoundId) {
-            try {
-              state = (await singlePlayerRequest({ action: "resume", roundId: storedRoundId })).state;
-            } catch {
-              state = undefined;
-            }
-          }
-          if (!state) {
-            state = (await singlePlayerRequest({ action: "start", pool: poolName, mode: storedMode, clientId })).state;
-          }
-          if (!state) throw new Error("题目服务没有返回本局");
-          if (cancelled) return;
-          const finishedState = { ...state, statsRecorded: storedStatsRecorded };
-          if (finishedState.finished && !finishedState.statsRecorded) {
-            restoredStats = addModeResult(
-              restoredStats,
-              finishedState.mode,
-              finishedState.won,
-              finishedState.guesses.length,
-              finishedState.maxGuesses,
-            ) as StatsByMode;
-            writeLocalStorage(storage.statsKey, JSON.stringify(restoredStats));
-            setStats(restoredStats);
-            finishedState.statsRecorded = true;
-          }
-          persistStoredGame(storage.gameKey, finishedState);
-          storage.legacyGameKeys.forEach(removeLocalStorage);
-          setGame(finishedState);
-          setShowResult(finishedState.finished);
-          setLoadError("");
-        } catch (error) {
-          if (!cancelled) setLoadError(error instanceof Error ? error.message : "题目服务暂时不可用");
-        } finally {
-          if (!cancelled) setHydrated(true);
+        const restored = restoreClassicRound(stored, songs, poolName);
+        let state: GameState;
+        if (restored) {
+          state = restored as GameState;
+        } else {
+          let savedShoe: string | null = null;
+          try { savedShoe = localStorage.getItem(storage.shoeKey); } catch { /* storage is optional */ }
+          const created = createClassicRound({
+            pool: poolName,
+            mode: storedMode,
+            songs,
+            shoe: readLocalShoe(savedShoe, songs.map((song) => song.bvid)),
+          });
+          writeLocalStorage(storage.shoeKey, JSON.stringify(created.shoe));
+          state = created.state as GameState;
         }
+        if (cancelled) return;
+        if (stored && stored.schemaVersion !== 5) {
+          setToast("玩法已更新，旧本局无法恢复，已重新抽取题目");
+          window.setTimeout(() => setToast(""), 2800);
+        }
+        if (state.finished && !state.statsRecorded) {
+          restoredStats = addModeResult(
+            restoredStats,
+            state.mode,
+            state.won,
+            state.guesses.length,
+            state.maxGuesses,
+          ) as StatsByMode;
+          writeLocalStorage(storage.statsKey, JSON.stringify(restoredStats));
+          setStats(restoredStats);
+          state.statsRecorded = true;
+        }
+        persistStoredGame(storage.gameKey, state);
+        storage.legacyGameKeys.forEach(removeLocalStorage);
+        setGame(state);
+        setShowResult(state.finished);
+        setLoadError("");
+        setHydrated(true);
 
         try {
           const firstVisit = !hasSeenRules(storage);
@@ -396,7 +367,7 @@ export function SinglePlayerPage() {
       cancelled = true;
       window.cancelAnimationFrame(frame);
     };
-  }, [poolName, storage]);
+  }, [poolName, storage, songs]);
 
   useEffect(() => () => {
     if (celebrationTimerRef.current) window.clearTimeout(celebrationTimerRef.current);
@@ -440,19 +411,22 @@ export function SinglePlayerPage() {
     persistStoredGame(targetStorage.gameKey, next);
   }
 
-  async function startServerRound(mode: GameMode, targetPool = poolName) {
+  function startLocalRound(mode: GameMode, targetPool = poolName) {
     if (requestBusy) return;
     setRequestBusy(true);
     try {
       const target = poolFor(targetPool);
-      const state = (await singlePlayerRequest({
-        action: "start",
-        pool: apiPoolName(targetPool),
+      const allBvids = target.songs.map((song) => song.bvid);
+      let savedShoe: string | null = null;
+      try { savedShoe = localStorage.getItem(target.storage.shoeKey); } catch { /* storage is optional */ }
+      const created = createClassicRound({
+        pool: targetPool,
         mode,
-        clientId: readSinglePlayerClientId(),
-      })).state;
-      if (!state) throw new Error("题目服务没有返回本局");
-      const next = { ...state, statsRecorded: false };
+        songs: target.songs,
+        shoe: readLocalShoe(savedShoe, allBvids),
+      });
+      writeLocalStorage(target.storage.shoeKey, JSON.stringify(created.shoe));
+      const next = { ...created.state, statsRecorded: false } as GameState;
       persistGame(next, target.storage);
       if (targetPool !== poolName) {
         setPoolName(targetPool);
@@ -464,7 +438,7 @@ export function SinglePlayerPage() {
       setLoadError("");
       return true;
     } catch (error) {
-      setToast(error instanceof Error ? error.message : "题目服务暂时不可用");
+      setToast(error instanceof Error ? error.message : "暂时无法开始新一局");
       return false;
     } finally {
       setRequestBusy(false);
@@ -473,7 +447,7 @@ export function SinglePlayerPage() {
 
   function changeMode(mode: GameMode) {
     if (!game || modeLocked) return;
-    void startServerRound(mode);
+    startLocalRound(mode);
   }
 
   function changeCatalog(targetPool: PoolName) {
@@ -482,7 +456,7 @@ export function SinglePlayerPage() {
     setSelectedBvid(null);
     setActiveOption(0);
     void (async () => {
-      const changed = await startServerRound(game.mode, targetPool);
+      const changed = startLocalRound(game.mode, targetPool);
       if (!changed) return;
       setToast(`已切换至${poolLabel(targetPool)}，本局题目已重新抽取`);
       window.setTimeout(() => setToast(""), 2600);
@@ -495,13 +469,12 @@ export function SinglePlayerPage() {
     setStats(next);
   }
 
-  async function makeGuess(bvid: string) {
+  function makeGuess(bvid: string) {
     if (!game || game.finished || guessedSet.has(bvid) || requestBusy) return;
     setRequestBusy(true);
     try {
-      const state = (await singlePlayerRequest({ action: "guess", roundId: game.roundId, bvid })).state;
-      if (!state) throw new Error("题目服务没有返回猜测结果");
-      const next = { ...state, statsRecorded: state.finished };
+      const guessed = guessClassic(game, songs, bvid);
+      const next = { ...guessed, statsRecorded: guessed.finished } as GameState;
       persistGame(next);
       setLoadError("");
       if (next.finished) {
@@ -514,11 +487,6 @@ export function SinglePlayerPage() {
         window.setTimeout(() => setShowResult(true), 450);
       }
     } catch (error) {
-      if (isRoundInvalidatedError(error)) {
-        setGame(null);
-        setLoadError(ROUND_INVALIDATED_MESSAGE);
-        return;
-      }
       setToast(error instanceof Error ? error.message : "提交失败，请稍后再试");
     } finally {
       setRequestBusy(false);
@@ -528,24 +496,16 @@ export function SinglePlayerPage() {
     setActiveOption(0);
   }
 
-  async function surrenderRound() {
+  function surrenderRound() {
     if (!game || game.finished || requestBusy) return;
     setRequestBusy(true);
     try {
-      const state = (await singlePlayerRequest({ action: "surrender", roundId: game.roundId })).state;
-      if (!state) throw new Error("题目服务没有返回答案");
-      const next = { ...state, statsRecorded: true };
+      const next = { ...surrenderClassic(game, songs), statsRecorded: true } as GameState;
       persistGame(next);
       if (!game.statsRecorded) recordResult(false, next.guesses.length, next.mode);
       setShowSurrender(false);
       setShowResult(true);
     } catch (error) {
-      if (isRoundInvalidatedError(error)) {
-        setShowSurrender(false);
-        setGame(null);
-        setLoadError(ROUND_INVALIDATED_MESSAGE);
-        return;
-      }
       setToast(error instanceof Error ? error.message : "暂时无法查看答案");
     } finally {
       setRequestBusy(false);
@@ -561,18 +521,15 @@ export function SinglePlayerPage() {
     if (celebrationTimerRef.current) window.clearTimeout(celebrationTimerRef.current);
     setShowResult(false);
     setShowSurrender(false);
-    void startServerRound(game.mode);
+    startLocalRound(game.mode);
   }
 
-  async function resetLocalRecord() {
+  function resetLocalRecord() {
     if (!game || !window.confirm(`清除${poolLabel(poolName)}的本机战绩和抽题历史？当前这一局会保留。`)) return;
     removeLocalStorage(storage.statsKey);
     storage.legacyStatsKeys.forEach(removeLocalStorage);
-    try {
-      await singlePlayerRequest({ action: "reset-pool", pool: apiPoolName(poolName), clientId: readSinglePlayerClientId() });
-    } catch {
-      // Local statistics can still be cleared if the server is temporarily unavailable.
-    }
+    removeLocalStorage(storage.shoeKey);
+    removeLocalStorage(poolName === "hardcore" ? "aiyiba-hardcore-shoe-v1" : "aiyiba-shoe-v2");
     setStats(normalizeModeStats() as StatsByMode);
     setShowStats(false);
     setToast("本机记录已清除");

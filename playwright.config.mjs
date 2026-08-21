@@ -17,7 +17,6 @@ export default defineConfig({
     video: "off",
   },
   projects: [
-    { name: "desktop", use: { ...devices["Desktop Chrome"] }, testIgnore: /mobile\.spec\.mjs/ },
-    { name: "mobile", use: { ...devices["Pixel 5"] }, testMatch: /mobile\.spec\.mjs/ },
+    { name: "desktop", use: { ...devices["Desktop Chrome"] } },
   ],
 });
