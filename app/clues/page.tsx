@@ -328,7 +328,7 @@ export default function ClueLadderPage() {
 
   function shareResult() {
     if (!game?.finished || !game.answer) return;
-    setShareCard(buildClueShareCardModel({ poolLabel: poolLabel(pool), state: game }) as ShareCardModel);
+    setShareCard(buildClueShareCardModel({ poolLabel: poolLabel(pool), state: game, siteOrigin: window.location.origin }) as ShareCardModel);
   }
 
   function resetLocalRecord() {

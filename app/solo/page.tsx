@@ -562,6 +562,7 @@ export function SinglePlayerPage() {
       maxGuesses: game.maxGuesses,
       answer,
       guesses,
+      siteOrigin: window.location.origin,
     }) as ShareCardModel);
   }
 

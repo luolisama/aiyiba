@@ -12,6 +12,8 @@ npm install
 npm run dev
 ~~~
 
+如果本地文件监听环境不支持文件系统事件，可在启动前设置 `USE_POLLING=1`（或 `true`）启用轮询。
+
 多人功能需要另开终端运行：
 
 ~~~powershell

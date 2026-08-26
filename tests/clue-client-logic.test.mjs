@@ -41,10 +41,12 @@ test("clue share includes revealed values, attempts, and the answer", () => {
       actions: [{ type: "guess", attempt: 1, name: "达拉崩吧", correct: true }],
       answer: { name: "达拉崩吧" },
     },
+    siteOrigin: "https://fork.example.test",
   });
   assert.match(text, /第 1\/6 次猜中/);
   assert.match(text, /引擎：VOCALOID/);
   assert.match(text, /答案：达拉崩吧/);
+  assert.match(text, /https:\/\/fork\.example\.test\/clues/);
 });
 
 test("browser clue search indexes contain only reduced search metadata", () => {

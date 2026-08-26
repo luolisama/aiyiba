@@ -1,4 +1,9 @@
 import { countTitleCharacters, formatTier } from "./game-logic.mjs";
+import { DEFAULT_SITE_ORIGIN, siteUrl } from "./site-origin.mjs";
+
+function sharePageUrl(siteOrigin, pathname) {
+  return siteUrl(siteOrigin ?? DEFAULT_SITE_ORIGIN, pathname);
+}
 
 function formatDate(value) {
   const [year, month, day] = String(value ?? "").split("-");
@@ -32,7 +37,7 @@ function cellDetail(cell) {
 const SINGLE_FIELD_LABELS = ["作品", "演唱", "引擎", "字数", "日期", "等级"];
 
 /** @param {any} options */
-export function buildSingleShareCardModel({ poolLabel, modeLabel, won, finishReason, maxGuesses, answer, guesses = [] }) {
+export function buildSingleShareCardModel({ poolLabel, modeLabel, won, finishReason, maxGuesses, answer, guesses = [], siteOrigin }) {
   const attemptCount = guesses.length;
   const outcome = won
     ? `第 ${attemptCount} 次猜中`
@@ -58,12 +63,12 @@ export function buildSingleShareCardModel({ poolLabel, modeLabel, won, finishRea
       })),
     })),
     footer: "来猜 ilem 的作品",
-    url: "aiyiba.getuphole.top/solo",
+    url: sharePageUrl(siteOrigin, "/solo"),
   };
 }
 
 /** @param {any} options */
-export function buildClueShareCardModel({ poolLabel, state }) {
+export function buildClueShareCardModel({ poolLabel, state, siteOrigin }) {
   const answer = state.answer;
   const outcome = state.won
     ? `第 ${state.actions.length} 次猜中`
@@ -84,12 +89,12 @@ export function buildClueShareCardModel({ poolLabel, state }) {
       tones: [action.correct ? "correct" : action.type === "skip" ? "partial" : "wrong"],
     })),
     footer: "一层一层，揭开这首作品",
-    url: "aiyiba.getuphole.top/clues",
+    url: sharePageUrl(siteOrigin, "/clues"),
   };
 }
 
 /** @param {any} options */
-export function buildPkShareCardModel({ poolLabel, modeLabel, gameType = "classic", outcome, answer, players = [], currentPlayerId, winnerPlayerId, winnerPlayerIds = [], clues = [] }) {
+export function buildPkShareCardModel({ poolLabel, modeLabel, gameType = "classic", outcome, answer, players = [], currentPlayerId, winnerPlayerId, winnerPlayerIds = [], clues = [], siteOrigin }) {
   const winners = new Set(winnerPlayerIds.length ? winnerPlayerIds : winnerPlayerId ? [winnerPlayerId] : []);
   const clueSummary = clues.length ? `已揭示：${clues.map((clue) => `${clue.label} ${clue.value}`).join(" · ")}` : "";
   return {
@@ -112,6 +117,6 @@ export function buildPkShareCardModel({ poolLabel, modeLabel, gameType = "classi
       };
     }),
     footer: "叫上朋友，一起猜 ilem 的作品",
-    url: "aiyiba.getuphole.top/multi",
+    url: sharePageUrl(siteOrigin, "/multi"),
   };
 }

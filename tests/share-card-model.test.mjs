@@ -6,6 +6,14 @@ import {
   buildPkShareCardModel,
   buildSingleShareCardModel,
 } from "../app/share-card-model.mjs";
+import {
+  buildRobotsConfig,
+  buildSitemapEntries,
+  multiplayerAllowedOriginsFromEnv,
+  normalizeSiteOrigin,
+  siteOriginFromEnv,
+  siteUrl,
+} from "../app/site-origin.mjs";
 
 const answer = {
   name: "夜间出租车",
@@ -32,9 +40,11 @@ test("single-player share card includes the real answer and current guess detail
       { tone: "correct", text: "2019-02-21" },
       { tone: "correct", text: "传说" },
     ] }],
+    siteOrigin: "https://fork.example.test/",
   });
   assert.equal(model.outcome, "第 1 次猜中");
   assert.equal(model.answerName, "夜间出租车");
+  assert.equal(model.url, "https://fork.example.test/solo");
   assert.match(model.answerMeta, /2019年2月21日/);
   assert.match(model.answerDetail, /217万播放/);
   assert.equal(model.rows[0].title, "夜间出租车");
@@ -62,10 +72,12 @@ test("clue share card distinguishes skips from guesses", () => {
         { type: "guess", attempt: 2, name: "葛平之歌", correct: false },
       ],
     },
+    siteOrigin: "http://localhost:4173",
   });
   assert.equal(model.outcome, "本轮已放弃");
   assert.equal(model.rows[0].title, "跳过，揭示下一层");
   assert.deepEqual(model.rows.map((row) => row.tones[0]), ["partial", "wrong"]);
+  assert.equal(model.url, "http://localhost:4173/clues");
 });
 
 test("multiplayer share card keeps each player history and marks the winner", () => {
@@ -80,11 +92,13 @@ test("multiplayer share card keeps each player history and marks the winner", ()
       { id: "p1", name: "玩家甲", attempts: 2, guesses: [{ name: "大时代" }, { name: "夜间出租车" }] },
       { id: "p2", name: "玩家乙", attempts: 0, guesses: [] },
     ],
+    siteOrigin: "https://fork.example.test",
   });
   assert.equal(model.rows[0].label, "玩家甲（我）");
   assert.match(model.rows[0].title, /大时代 → 夜间出租车/);
   assert.match(model.rows[0].detail, /本局胜者/);
   assert.equal(model.rows[1].title, "本轮未猜");
+  assert.equal(model.url, "https://fork.example.test/multi");
 });
 
 test("multiplayer clue share card includes revealed clues and each player's actions", () => {
@@ -109,4 +123,28 @@ test("multiplayer clue share card includes revealed clues and each player's acti
   assert.match(model.outcomeDetail, /引擎 VOCALOID/);
   assert.match(model.rows[0].title, /第1层跳过 → 夜间出租车/);
   assert.match(model.rows[1].detail, /本局胜者/);
+});
+
+test("site origins normalize, reject paths, and drive metadata URLs", () => {
+  assert.equal(siteOriginFromEnv(undefined), "https://aiyiba.getuphole.top");
+  assert.deepEqual(multiplayerAllowedOriginsFromEnv(undefined, "https://fork.example.test"), ["https://fork.example.test"]);
+  assert.deepEqual(multiplayerAllowedOriginsFromEnv("https://allowed.example.test, https://second.example.test", "https://fork.example.test"), [
+    "https://allowed.example.test",
+    "https://second.example.test",
+  ]);
+  assert.equal(normalizeSiteOrigin("https://example.test/"), "https://example.test");
+  assert.equal(siteUrl("http://127.0.0.1:3000", "/solo"), "http://127.0.0.1:3000/solo");
+  assert.deepEqual(buildSitemapEntries("https://fork.example.test").map((entry) => entry.url), [
+    "https://fork.example.test/",
+    "https://fork.example.test/solo",
+    "https://fork.example.test/clues",
+    "https://fork.example.test/timeline",
+    "https://fork.example.test/multi",
+  ]);
+  assert.deepEqual(buildRobotsConfig("https://fork.example.test"), {
+    rules: { userAgent: "*", allow: "/", disallow: ["/api/", "/pk/ws"] },
+    sitemap: "https://fork.example.test/sitemap.xml",
+  });
+  assert.throws(() => normalizeSiteOrigin("https://example.test/path"), /without a path/);
+  assert.throws(() => normalizeSiteOrigin("ftp://example.test"), /absolute http\(s\) origin/);
 });

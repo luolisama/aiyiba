@@ -1,3 +1,5 @@
+import { DEFAULT_SITE_ORIGIN, siteUrl } from "../site-origin.mjs";
+
 const EMPTY_POOL_STATS = () => ({
   played: 0,
   wins: 0,
@@ -53,7 +55,8 @@ export function resetCluePoolStats(value, pool) {
   return next;
 }
 
-export function buildClueShareText({ poolLabel, state, playUrl = "https://aiyiba.getuphole.top/clues" }) {
+export function buildClueShareText({ poolLabel, state, playUrl, siteOrigin }) {
+  const resolvedPlayUrl = playUrl ?? siteUrl(siteOrigin ?? DEFAULT_SITE_ORIGIN, "/clues");
   const answer = state.answer;
   const outcome = state.won
     ? `第 ${state.actions.length}/6 次猜中 🎉`
@@ -72,6 +75,6 @@ export function buildClueShareText({ poolLabel, state, playUrl = "https://aiyiba
     ...actionLines,
     "",
     answer ? `答案：${answer.name}` : "",
-    `来挑战线索阶梯：${playUrl}`,
+    `来挑战线索阶梯：${resolvedPlayUrl}`,
   ].filter((line, index, lines) => line !== "" || (index > 0 && lines[index - 1] !== "")).join("\n").trim();
 }

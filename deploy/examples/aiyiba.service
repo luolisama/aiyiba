@@ -9,6 +9,7 @@ Group=aiyiba
 WorkingDirectory=/srv/aiyiba/current
 Environment=NODE_ENV=production
 Environment=PORT=3000
+Environment=SITE_ORIGIN=https://example.com
 Environment=PK_ALLOWED_ORIGINS=https://example.com
 ExecStart=/usr/bin/npm run start -- --hostname 127.0.0.1 --port 3000
 Restart=on-failure

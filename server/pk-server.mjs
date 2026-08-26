@@ -10,12 +10,14 @@ import {
   PK_START_GRACE_MS,
 } from "./pk-game.mjs";
 import { ROUND_INVALIDATED_MESSAGE } from "../app/round-errors.mjs";
+import { multiplayerAllowedOriginsFromEnv, siteOriginFromEnv } from "../app/site-origin.mjs";
 
 const catalog = JSON.parse(await readFile(new URL("../app/data/songs.json", import.meta.url), "utf8"));
 const hardcoreCatalog = JSON.parse(await readFile(new URL("../app/data/hardcore-songs.json", import.meta.url), "utf8"));
 const configuredPort = Number(process.env.PK_PORT ?? 3001);
 const port = Number.isInteger(configuredPort) && configuredPort > 0 && configuredPort < 65_536 ? configuredPort : 3001;
 const host = process.env.PK_HOST ?? "127.0.0.1";
+const siteOrigin = siteOriginFromEnv(process.env.SITE_ORIGIN);
 const configuredMaxConnections = Number(process.env.PK_MAX_CONNECTIONS ?? 200);
 const maxConnections = Number.isInteger(configuredMaxConnections) && configuredMaxConnections > 0 ? configuredMaxConnections : 200;
 const configuredMaxConnectionsPerIp = Number(process.env.PK_MAX_CONNECTIONS_PER_IP ?? 24);
@@ -84,12 +86,7 @@ const roomAlertRatio = Number.isFinite(configuredRoomAlertRatio) && configuredRo
 const messageWindowMs = 10_000;
 const maxMessagesPerWindow = 40;
 const heartbeatMs = 30_000;
-const allowedOrigins = new Set(
-  (process.env.PK_ALLOWED_ORIGINS ?? "https://aiyiba.getuphole.top")
-    .split(",")
-    .map((origin) => origin.trim())
-    .filter(Boolean),
-);
+const allowedOrigins = new Set(multiplayerAllowedOriginsFromEnv(process.env.PK_ALLOWED_ORIGINS, siteOrigin));
 const countdownTimers = new Map();
 const clueStageTimers = new Map();
 const disconnectTimers = new Map();

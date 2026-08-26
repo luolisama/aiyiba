@@ -28,6 +28,20 @@ test("single-player modes keep working after their APIs are blocked", async ({ p
   await expect(page.locator(".timeline-board article")).toHaveCount(2);
 });
 
+test("metadata routes use the running site origin", async ({ page }) => {
+  const sitemap = await page.request.get("/sitemap.xml");
+  expect(sitemap.ok()).toBeTruthy();
+  const sitemapText = await sitemap.text();
+  expect(sitemapText).toContain("http://127.0.0.1:3000/solo");
+  expect(sitemapText).not.toContain("aiyiba.getuphole.top");
+
+  const robots = await page.request.get("/robots.txt");
+  expect(robots.ok()).toBeTruthy();
+  const robotsText = await robots.text();
+  expect(robotsText).toContain("Sitemap: http://127.0.0.1:3000/sitemap.xml");
+  expect(robotsText).toContain("Disallow: /pk/ws");
+});
+
 test("classic mode switches catalogs, accepts pinyin, and exports a result image", async ({ page }) => {
   await page.goto("/solo");
   await dismissGuide(page);
@@ -39,8 +53,14 @@ test("classic mode switches catalogs, accepts pinyin, and exports a result image
   await search.fill("dalabengba");
   await page.getByText("达拉崩吧", { exact: true }).first().click();
   await page.getByRole("button", { name: /猜一下/ }).click();
-  await page.getByRole("button", { name: "看答案并放弃本局" }).click();
-  await page.getByRole("button", { name: "放弃并看答案" }).click();
+  const surrender = page.getByRole("button", { name: "看答案并放弃本局" });
+  if (await surrender.isVisible()) {
+    await surrender.click();
+    await page.getByRole("button", { name: "放弃并看答案" }).click();
+  } else {
+    // The random round can occasionally use the searched title as its answer.
+    await page.getByRole("button", { name: "查看完整结果" }).click();
+  }
   await page.getByRole("button", { name: "生成战绩图" }).click();
   const preview = page.getByAltText("生成的哎一把战绩图片预览");
   await expect(preview).toBeVisible();

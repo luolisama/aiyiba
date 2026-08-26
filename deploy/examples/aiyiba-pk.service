@@ -10,6 +10,7 @@ WorkingDirectory=/srv/aiyiba/current
 Environment=NODE_ENV=production
 Environment=PK_HOST=127.0.0.1
 Environment=PK_PORT=3001
+Environment=SITE_ORIGIN=https://example.com
 Environment=PK_ALLOWED_ORIGINS=https://example.com
 Environment=PK_MAX_CONNECTIONS=200
 Environment=PK_MAX_CONNECTIONS_PER_IP=24

@@ -901,6 +901,7 @@ export default function PkPage() {
       winnerPlayerId: resultWinnerId,
       winnerPlayerIds: resultWinnerIds,
       clues: room.clues ?? [],
+      siteOrigin: window.location.origin,
     }) as ShareCardModel);
   }
 

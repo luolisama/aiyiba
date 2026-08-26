@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { siteOriginFromEnv } from "./site-origin.mjs";
+
+const siteOrigin = siteOriginFromEnv(process.env.SITE_ORIGIN);
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://aiyiba.getuphole.top"),
+  metadataBase: new URL(siteOrigin),
   title: "哎一把｜猜 ilem 的作品",
   description: "单人或与朋友一起，从演唱、引擎、歌名字数、日期与播放等级猜出 ilem 的音乐作品。",
   icons: {
