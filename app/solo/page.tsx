@@ -876,7 +876,7 @@ export function SinglePlayerPage() {
               <li><b>传说</b>：100万—1000万</li>
               <li><b>神话</b>：1000万以上</li>
             </ul>
-            <p className="fine-print">每轮题袋抽完前不会重复；战绩保存在当前浏览器，进行中的对局会临时保存在服务器。</p>
+            <p className="fine-print">每轮题袋抽完前不会重复；战绩、题袋和进行中的对局均保存在当前浏览器。</p>
             {isFirstVisitGuide && (
               <>
                 <button className="onboarding-start" onClick={dismissRules}>知道了，开始猜</button>
@@ -915,7 +915,7 @@ export function SinglePlayerPage() {
             </div>
             <p className="shoe-progress">本轮题袋已抽取 <b>{game.poolProgress}</b> / {game.poolSize} 首，用完前不会重复。</p>
             <button className="reset-button" onClick={resetLocalRecord}>清除本机战绩与抽题历史</button>
-            <p className="fine-print">战绩保存在当前浏览器，题目和进行中的对局由服务器临时保存。</p>
+            <p className="fine-print">战绩、题目和进行中的对局均保存在当前浏览器。</p>
           </section>
         </div>
       )}

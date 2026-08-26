@@ -79,7 +79,7 @@ export default function RulesDialog({ open, onClose, mode }: RulesDialogProps) {
           <li><b>神话</b>：1000万以上</li>
         </ul>
 
-        <p className="fine-print">每轮题袋抽完前不会重复；进行中的对局会临时保存在服务器，服务更新后可能需要刷新页面重新开始。</p>
+        <p className="fine-print">每轮题袋抽完前不会重复；进行中的单人对局保存在当前浏览器，页面更新后可能需要刷新并重新开始。</p>
         <button className="onboarding-start" type="button" onClick={onClose}>知道了，开始游戏</button>
       </section>
     </div>

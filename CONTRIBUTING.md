@@ -26,15 +26,13 @@ npm run pk:server
 4. 不要为一次性的文案、颜色或像素调整新增永久回归测试。
 5. 会影响公共状态机、判定、题库结构或安全边界的改动必须补充相应测试。
 
-提交前至少运行：
+提交前运行：
 
 ~~~powershell
-npm run typecheck
-npm run lint
-npm test
+npm run verify
 ~~~
 
-涉及完整页面流程或多人协议时，再运行 npm run test:e2e。
+涉及完整页面流程或多人协议时，再运行 `npm run test:e2e`；正式发版运行 `npm run verify:release`。
 
 ## 题库纠错
 
