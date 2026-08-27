@@ -1,9 +1,16 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { siteOriginFromEnv } from "./site-origin.mjs";
+import { siteOriginFromEnv, siteVerificationTokenFromEnv } from "./site-origin.mjs";
 
 const siteOrigin = siteOriginFromEnv(process.env.SITE_ORIGIN);
-
+const googleSiteVerification = siteVerificationTokenFromEnv(
+  process.env.GOOGLE_SITE_VERIFICATION,
+  "GOOGLE_SITE_VERIFICATION",
+);
+const bingSiteVerification = siteVerificationTokenFromEnv(
+  process.env.BING_SITE_VERIFICATION,
+  "BING_SITE_VERIFICATION",
+);
 export const metadata: Metadata = {
   metadataBase: new URL(siteOrigin),
   title: "哎一把｜猜 ilem 的作品",
@@ -16,6 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "哎一把｜猜 ilem 的作品",
     description: "从演唱、引擎、日期与播放等级等线索中，猜出 ilem 的音乐作品。",
+    siteName: "哎一把",
     images: ["/og.png"],
   },
   twitter: {
@@ -23,6 +31,10 @@ export const metadata: Metadata = {
     title: "哎一把｜猜 ilem 的作品",
     description: "从演唱、引擎、日期与播放等级等线索中，猜出 ilem 的音乐作品。",
     images: ["/og.png"],
+  },
+  verification: {
+    google: googleSiteVerification,
+    other: bingSiteVerification ? { "msvalidate.01": bingSiteVerification } : undefined,
   },
 };
 

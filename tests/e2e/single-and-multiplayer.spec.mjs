@@ -40,6 +40,26 @@ test("metadata routes use the running site origin", async ({ page }) => {
   const robotsText = await robots.text();
   expect(robotsText).toContain("Sitemap: http://127.0.0.1:3000/sitemap.xml");
   expect(robotsText).toContain("Disallow: /pk/ws");
+
+  const canonicalPaths = ["/", "/solo", "/clues", "/timeline", "/multi"];
+  for (const pathname of canonicalPaths) {
+    await page.goto(pathname);
+    const expectedCanonical = pathname === "/" ? "http://127.0.0.1:3000" : `http://127.0.0.1:3000${pathname}`;
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", expectedCanonical);
+  }
+
+  await page.goto("/");
+  await expect(page.locator('meta[name="google-site-verification"]')).toHaveAttribute("content", "test-google-verification");
+  await expect(page.locator('meta[name="msvalidate.01"]')).toHaveAttribute("content", "test-bing-verification");
+  await expect(page.locator('meta[property="og:site_name"]')).toHaveAttribute("content", "哎一把");
+
+  const websiteData = JSON.parse(await page.locator('script[type="application/ld+json"]').textContent());
+  expect(websiteData).toEqual({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "哎一把",
+    url: "http://127.0.0.1:3000/",
+  });
 });
 
 test("classic mode switches catalogs, accepts pinyin, and exports a result image", async ({ page }) => {

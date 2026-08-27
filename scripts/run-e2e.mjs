@@ -105,6 +105,8 @@ try {
     const vinextCli = path.join(root, "node_modules", "vinext", "dist", "cli.js");
     web = start(process.execPath, [vinextCli, "dev", "--host", "127.0.0.1", "--port", "3000"], {
       SITE_ORIGIN: localBaseUrl,
+      GOOGLE_SITE_VERIFICATION: "test-google-verification",
+      BING_SITE_VERIFICATION: "test-bing-verification",
     });
     pk = start(process.execPath, [path.join(root, "server", "pk-server.mjs")], {
       PK_HOST: "127.0.0.1",

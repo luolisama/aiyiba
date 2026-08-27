@@ -23,6 +23,10 @@ npm run build
 显式的 `PK_ALLOWED_ORIGINS` 优先于 `SITE_ORIGIN`。请在 `npm run build` 前设置 `SITE_ORIGIN`；网页构建会将
 规范化后的来源写入 Vinext/Cloudflare 运行时使用的 bundle。
 
+如需验证 Google Search Console 或 Bing Webmaster Tools，可分别设置 `GOOGLE_SITE_VERIFICATION` 和
+`BING_SITE_VERIFICATION`。只填写平台 meta 标签的 `content` 值；两项均为可选，并且必须在 `npm run build`
+前设置，因为 Vinext 会把站点元数据写入构建产物。
+
 ## 启动
 
 ~~~bash

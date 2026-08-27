@@ -13,6 +13,7 @@ import {
   normalizeSiteOrigin,
   siteOriginFromEnv,
   siteUrl,
+  siteVerificationTokenFromEnv,
 } from "../app/site-origin.mjs";
 
 const answer = {
@@ -147,4 +148,13 @@ test("site origins normalize, reject paths, and drive metadata URLs", () => {
   });
   assert.throws(() => normalizeSiteOrigin("https://example.test/path"), /without a path/);
   assert.throws(() => normalizeSiteOrigin("ftp://example.test"), /absolute http\(s\) origin/);
+});
+
+test("site verification tokens are optional and reject unsafe values", () => {
+  assert.equal(siteVerificationTokenFromEnv(undefined, "GOOGLE_SITE_VERIFICATION"), undefined);
+  assert.equal(siteVerificationTokenFromEnv("  abc_DEF-123  ", "GOOGLE_SITE_VERIFICATION"), "abc_DEF-123");
+  assert.throws(
+    () => siteVerificationTokenFromEnv("<meta name=verification>", "GOOGLE_SITE_VERIFICATION"),
+    /GOOGLE_SITE_VERIFICATION/,
+  );
 });

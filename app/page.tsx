@@ -1,8 +1,26 @@
+import type { Metadata } from "next";
+
 import HomeRulesDialog from "./home-rules-dialog";
+import { siteOriginFromEnv, siteUrl } from "./site-origin.mjs";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default function HomePage() {
+  const websiteStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "哎一把",
+    url: siteUrl(siteOriginFromEnv(process.env.SITE_ORIGIN), "/"),
+  };
+
   return (
     <main className="home-shell">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteStructuredData).replaceAll("<", "\\u003c") }}
+      />
       <header className="topbar home-topbar">
         <div className="brand" aria-label="哎一把">
           <a
@@ -23,7 +41,7 @@ export default function HomePage() {
       <section className="home-hero" aria-labelledby="home-title">
         <p className="home-kicker">猜 ilem 的作品</p>
         <h1 id="home-title">听过很多遍，<br /><span>你真的认得它吗？</span></h1>
-        <p>从歌手、引擎、投稿日期和播放等级等线索中，一步步找出正确答案。</p>
+        <p>哎一把是以 ilem 音乐作品为题库的中文猜歌网站；从歌手、引擎、投稿日期和播放等级等线索中，一步步找出正确答案。</p>
       </section>
 
       <section className="home-modes" aria-labelledby="mode-title">

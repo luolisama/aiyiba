@@ -2,6 +2,8 @@ export const DEFAULT_SITE_ORIGIN = "https://aiyiba.getuphole.top";
 
 export const PUBLIC_SITE_PATHS = ["/", "/solo", "/clues", "/timeline", "/multi"];
 
+const SITE_VERIFICATION_TOKEN_PATTERN = /^[A-Za-z0-9_-]{8,256}$/u;
+
 export function normalizeSiteOrigin(value) {
   if (typeof value !== "string" || !value.trim()) {
     throw new TypeError("SITE_ORIGIN must be an absolute http(s) origin");
@@ -28,6 +30,15 @@ export function normalizeSiteOrigin(value) {
 
 export function siteOriginFromEnv(value) {
   return value === undefined ? DEFAULT_SITE_ORIGIN : normalizeSiteOrigin(value);
+}
+
+export function siteVerificationTokenFromEnv(value, variableName) {
+  if (value === undefined || value.trim() === "") return undefined;
+  const normalized = value.trim();
+  if (!SITE_VERIFICATION_TOKEN_PATTERN.test(normalized)) {
+    throw new TypeError(`${variableName} must contain only letters, numbers, underscores, or hyphens`);
+  }
+  return normalized;
 }
 
 export function multiplayerAllowedOriginsFromEnv(explicitOrigins, siteOrigin) {
