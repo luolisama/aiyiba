@@ -8,6 +8,7 @@ import hardcoreSearchSongsJson from "../data/hardcore-search-songs.json";
 import songsJson from "../data/songs.json";
 import hardcoreSongsJson from "../data/hardcore-songs.json";
 import CatalogSelector from "../catalog-selector";
+import { trackGameEvent } from "../analytics-client";
 import {
   createTimelineRound,
   placeTimeline,
@@ -175,6 +176,20 @@ export default function TimelinePage() {
       const state = placeTimeline(game, POOLS[pool], slot) as TimelineState;
       setGame(state);
       writeGame(state);
+      if (game.placements.length === 0) {
+        trackGameEvent({ event: "game_engaged", roundId: game.roundId, mode: "timeline", pool: game.pool });
+      }
+      if (state.finished) {
+        trackGameEvent({
+          event: "game_completed",
+          roundId: state.roundId,
+          mode: "timeline",
+          pool: state.pool,
+          outcome: "completed",
+          attempts: state.placements.length,
+          score: state.score,
+        });
+      }
       setToast(state.lastPlacement?.correct ? "放对了！" : `差一点，正确日期是 ${formatDate(state.lastPlacement?.song.publicationDate ?? "")}`);
       window.setTimeout(() => setToast(""), 2600);
     } catch (error) {
@@ -211,6 +226,13 @@ export default function TimelinePage() {
       setToast(`已切换至${poolLabel(targetPool)}，本局题目已重新抽取`);
       window.setTimeout(() => setToast(""), 2600);
     })();
+  }
+
+  function replayRound() {
+    if (!game || busy) return;
+    if (startRound(pool)) {
+      trackGameEvent({ event: "replay_requested", roundId: game.roundId, mode: "timeline", pool: game.pool });
+    }
   }
   const placementByBvid = new Map(game.placements.map((placement) => [placement.bvid, placement]));
 
@@ -289,7 +311,7 @@ export default function TimelinePage() {
             <p className="round-status">JOURNEY COMPLETE</p>
             <h2>{game.score} / {game.maxPlacements}</h2>
             <p>{game.score === game.maxPlacements ? "全部放对，时间线完全复原。" : game.score >= 6 ? "大部分年代都认对了。" : "再坐一次时光机，记住这些日期吧。"}</p>
-            <button className="primary" type="button" onClick={() => void startRound(pool)}>再来一趟 →</button>
+            <button className="primary" type="button" onClick={replayRound}>再来一趟 →</button>
           </section>
         )}
       </section>

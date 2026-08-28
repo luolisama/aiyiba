@@ -17,6 +17,7 @@ import type { ShareCardModel } from "../share-card";
 import { buildClueShareCardModel } from "../share-card-model.mjs";
 import { normalizeClueStats, recordClueResult, resetCluePoolStats } from "./client-logic.mjs";
 import CatalogSelector from "../catalog-selector";
+import { trackGameEvent } from "../analytics-client";
 import {
   actClue,
   createClueRound,
@@ -291,10 +292,21 @@ export default function ClueLadderPage() {
       const state = actClue(game, POOLS[pool].items, action, bvid) as GameState;
       setGame(state);
       writeGame(state);
+      if (game.actions.length === 0) {
+        trackGameEvent({ event: "game_engaged", roundId: game.roundId, mode: "solo_clues", pool: game.pool });
+      }
       setQuery("");
       setSelectedBvid(null);
       setActiveOption(0);
       if (state.finished) {
+        trackGameEvent({
+          event: "game_completed",
+          roundId: state.roundId,
+          mode: "solo_clues",
+          pool: state.pool,
+          outcome: state.won ? "win" : state.finishReason === "surrender" ? "surrender" : "loss",
+          attempts: state.actions.length,
+        });
         saveFinishedResult(state);
         window.setTimeout(() => setShowResult(true), 280);
       }
@@ -313,6 +325,17 @@ export default function ClueLadderPage() {
       const state = surrenderClue(game, POOLS[pool].items) as GameState;
       setGame(state);
       writeGame(state);
+      if (game.actions.length === 0) {
+        trackGameEvent({ event: "game_engaged", roundId: game.roundId, mode: "solo_clues", pool: game.pool });
+      }
+      trackGameEvent({
+        event: "game_completed",
+        roundId: state.roundId,
+        mode: "solo_clues",
+        pool: state.pool,
+        outcome: "surrender",
+        attempts: state.actions.length,
+      });
       saveFinishedResult(state);
       setShowSurrender(false);
       setShowResult(true);
@@ -324,6 +347,13 @@ export default function ClueLadderPage() {
   function closeRules() {
     try { localStorage.setItem(RULES_STORAGE_KEY, "seen"); } catch { /* optional */ }
     setShowRules(false);
+  }
+
+  function replayRound() {
+    if (!game || busy) return;
+    if (startRound(pool)) {
+      trackGameEvent({ event: "replay_requested", roundId: game.roundId, mode: "solo_clues", pool: game.pool });
+    }
   }
 
   function shareResult() {
@@ -464,7 +494,7 @@ export default function ClueLadderPage() {
         {game.finished && game.answer && (
           <section className="round-summary" aria-label="本局答案">
             <div><p className="round-status">{game.won ? "LADDER CLEARED" : "ROUND ENDED"}</p><h2>{game.answer.name}</h2><p>{game.won ? `第 ${game.actions.length} 次猜中` : "答案已经揭晓"}</p></div>
-            <div className="summary-actions"><button onClick={() => setShowResult(true)}>查看完整结果</button><button className="primary" onClick={() => void startRound(pool)}>再来一把 →</button></div>
+            <div className="summary-actions"><button onClick={() => setShowResult(true)}>查看完整结果</button><button className="primary" onClick={replayRound}>再来一把 →</button></div>
           </section>
         )}
       </section>
@@ -529,7 +559,7 @@ export default function ClueLadderPage() {
             <p className="answer-meta">{game.answer.vocalists.join("、") || "无"} · {game.answer.engines.join("、") || "无"} · {formatDate(game.answer.publicationDate)}</p>
             <div className="answer-chips"><span>{game.answer.viewTier.replace(/曲$/u, "")}</span><span>{formatViews(game.answer.views)}</span><span>第 {game.actions.length} 次结束</span></div>
             <div className="result-actions">{game.answer.bilibiliUrl ? <a href={game.answer.bilibiliUrl} target="_blank" rel="noreferrer">去 B 站听 ↗</a> : <span className="result-link-unavailable">原投稿已不可访问</span>}<button onClick={shareResult}>生成战绩图</button></div>
-            <button className="again-button" onClick={() => void startRound(pool)}>再来一把 <span>→</span></button>
+            <button className="again-button" onClick={replayRound}>再来一把 <span>→</span></button>
           </section>
         </div>
       )}

@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { createServer } from "node:net";
+import os from "node:os";
+import path from "node:path";
 import test from "node:test";
 
 import { WebSocket } from "ws";
@@ -114,6 +117,21 @@ async function waitForLog(server, pattern, timeout = 4_000) {
     await new Promise((resolve) => setTimeout(resolve, 50));
   }
   throw new Error(`timed out waiting for PK log ${pattern}: ${server.getLog()}`);
+}
+
+async function waitForAnalyticsFile(directory, expectedLines, source = "multiplayer", timeout = 4_000) {
+  const file = path.join(directory, `${source}-${new Date().toISOString().slice(0, 10)}.jsonl`);
+  const deadline = Date.now() + timeout;
+  while (Date.now() < deadline) {
+    try {
+      const lines = (await readFile(file, "utf8")).split(/\r?\n/u).filter(Boolean);
+      if (lines.length >= expectedLines) return lines.map((line) => JSON.parse(line));
+    } catch {
+      // The asynchronous sink may not have created the file yet.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  throw new Error(`timed out waiting for ${expectedLines} ${source} analytics events`);
 }
 
 test("explicit host leave dissolves the room and notifies every connected guest", async (context) => {
@@ -396,4 +414,67 @@ test("metrics emit threshold alerts without logging player data", async (context
   server.clients.push(client);
   await waitForLog(server, /"event":"metrics_alert"/);
   assert.doesNotMatch(server.getLog(), /integration-device|匿名|玩家/);
+});
+
+test("multiplayer analytics records participants without room secrets or answers", async (context) => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), "aiyiba-pk-analytics-"));
+  context.after(() => rm(directory, { recursive: true, force: true }));
+  const server = await startServer(context, {
+    ANALYTICS_LOG_DIR: directory,
+    ANALYTICS_TRUST_PROXY: "true",
+    PK_COUNTDOWN_MS: "0",
+    PK_GUESS_INTERVAL_MS: "0",
+    PK_START_GRACE_MS: "0",
+  });
+  const host = await connect(server.port);
+  const guest = await connect(server.port);
+  server.clients.push(host, guest);
+
+  const webResponse = await fetch(`http://127.0.0.1:${server.port}/analytics`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      event: {
+        schemaVersion: 1,
+        event: "game_engaged",
+        eventId: "web-round-12345678:game_engaged",
+        visitorId: "web-device-12345678",
+        sessionId: "web-session-12345678",
+        roundId: "web-round-12345678",
+        mode: "solo_clues",
+        pool: "normal",
+      },
+      observed: { ip: "203.0.113.20", userAgent: "Test Browser" },
+    }),
+  });
+  assert.equal(webResponse.status, 202);
+  const webEvents = await waitForAnalyticsFile(directory, 1, "web");
+  assert.equal(webEvents[0].source, "web");
+  assert.equal(webEvents[0].ip, "203.0.113.20");
+
+  host.send("room:create", { name: "统计房主", visibility: "private", deviceId: "analytics-device-host" });
+  const created = await host.wait("room:created");
+  guest.send("room:join", { code: created.code, name: "统计访客", deviceId: "analytics-device-guest" });
+  const joined = await guest.wait("room:joined");
+  host.send("player:ready");
+  guest.send("player:ready");
+  await host.wait("room:state", 3_000, (message) => message.players.every((player) => player.ready));
+  host.send("round:start");
+  await host.wait("round:countdown");
+  await host.wait("round:started");
+  const startedEvents = await waitForAnalyticsFile(directory, 2);
+  assert.equal(startedEvents.filter((item) => item.event === "game_engaged").length, 2);
+
+  const endedPromise = host.wait("round:ended", 5_000);
+  guest.send("room:leave");
+  await guest.wait("room:left");
+  await endedPromise;
+  const allEvents = await waitForAnalyticsFile(directory, 4);
+  assert.equal(allEvents.filter((item) => item.event === "game_completed").length, 2);
+  const serialized = JSON.stringify(allEvents);
+  assert.doesNotMatch(serialized, /统计房主|统计访客/);
+  assert.doesNotMatch(serialized, new RegExp(created.code));
+  assert.doesNotMatch(serialized, new RegExp(created.playerToken));
+  assert.doesNotMatch(serialized, new RegExp(joined.playerToken));
+  assert.doesNotMatch(serialized, /answer|bvid|nickname|roomCode|playerToken/u);
 });

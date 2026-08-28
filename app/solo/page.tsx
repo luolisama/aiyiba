@@ -13,6 +13,7 @@ import type { ShareCardModel } from "../share-card";
 import { isExtendedOnlySong } from "../catalog-logic.mjs";
 import { buildSingleShareCardModel } from "../share-card-model.mjs";
 import CatalogSelector from "../catalog-selector";
+import { trackGameEvent } from "../analytics-client";
 import {
   addModeResult,
   countTitleCharacters,
@@ -476,8 +477,20 @@ export function SinglePlayerPage() {
       const guessed = guessClassic(game, songs, bvid);
       const next = { ...guessed, statsRecorded: guessed.finished } as GameState;
       persistGame(next);
+      if (game.guesses.length === 0) {
+        trackGameEvent({ event: "game_engaged", roundId: game.roundId, mode: "solo_classic", pool: game.pool, difficulty: game.mode });
+      }
       setLoadError("");
       if (next.finished) {
+        trackGameEvent({
+          event: "game_completed",
+          roundId: next.roundId,
+          mode: "solo_classic",
+          pool: next.pool,
+          difficulty: next.mode,
+          outcome: next.won ? "win" : next.finishReason === "surrender" ? "surrender" : "loss",
+          attempts: next.guesses.length,
+        });
         if (!game.statsRecorded) recordResult(next.won, next.guesses.length, next.mode);
         if (next.won) {
           setShowCelebration(true);
@@ -502,6 +515,18 @@ export function SinglePlayerPage() {
     try {
       const next = { ...surrenderClassic(game, songs), statsRecorded: true } as GameState;
       persistGame(next);
+      if (game.guesses.length === 0) {
+        trackGameEvent({ event: "game_engaged", roundId: game.roundId, mode: "solo_classic", pool: game.pool, difficulty: game.mode });
+      }
+      trackGameEvent({
+        event: "game_completed",
+        roundId: next.roundId,
+        mode: "solo_classic",
+        pool: next.pool,
+        difficulty: next.mode,
+        outcome: "surrender",
+        attempts: next.guesses.length,
+      });
       if (!game.statsRecorded) recordResult(false, next.guesses.length, next.mode);
       setShowSurrender(false);
       setShowResult(true);
@@ -521,7 +546,9 @@ export function SinglePlayerPage() {
     if (celebrationTimerRef.current) window.clearTimeout(celebrationTimerRef.current);
     setShowResult(false);
     setShowSurrender(false);
-    startLocalRound(game.mode);
+    if (startLocalRound(game.mode)) {
+      trackGameEvent({ event: "replay_requested", roundId: game.roundId, mode: "solo_classic", pool: game.pool, difficulty: game.mode });
+    }
   }
 
   function resetLocalRecord() {

@@ -22,6 +22,13 @@ export default defineConfig(async ({ mode }) => {
     process.env.BING_SITE_VERIFICATION ?? loadedEnv.BING_SITE_VERIFICATION,
     "BING_SITE_VERIFICATION",
   );
+  const analyticsTrustProxy = /^(1|true)$/iu.test(
+    process.env.ANALYTICS_TRUST_PROXY ?? loadedEnv.ANALYTICS_TRUST_PROXY ?? "",
+  );
+  const analyticsIngestUrl = (process.env.ANALYTICS_INGEST_URL ?? loadedEnv.ANALYTICS_INGEST_URL ?? "").trim();
+  if (analyticsIngestUrl && !/^http:\/\/127\.0\.0\.1:[0-9]+\/analytics$/u.test(analyticsIngestUrl)) {
+    throw new TypeError("ANALYTICS_INGEST_URL must be a loopback analytics endpoint");
+  }
 
   // Keep Wrangler and Miniflare state project-local. These are non-secret tool
   // settings; application environment belongs in ignored `.env*` files.
@@ -37,6 +44,8 @@ export default defineConfig(async ({ mode }) => {
       "process.env.SITE_ORIGIN": JSON.stringify(configuredSiteOrigin),
       "process.env.GOOGLE_SITE_VERIFICATION": JSON.stringify(googleSiteVerification ?? ""),
       "process.env.BING_SITE_VERIFICATION": JSON.stringify(bingSiteVerification ?? ""),
+      "process.env.ANALYTICS_TRUST_PROXY": JSON.stringify(analyticsTrustProxy ? "true" : "false"),
+      "process.env.ANALYTICS_INGEST_URL": JSON.stringify(analyticsIngestUrl),
     },
     server: usePolling
       ? { watch: { useFsEvents: false, usePolling: true } }

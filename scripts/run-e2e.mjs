@@ -1,6 +1,7 @@
 import { spawn } from "node:child_process";
 import { once } from "node:events";
-import { rm } from "node:fs/promises";
+import { mkdtemp, rm } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 
 const root = path.resolve(import.meta.dirname, "..");
@@ -98,21 +99,28 @@ process.once("SIGTERM", () => { void handleSignal("SIGTERM"); });
 const baseUrl = process.env.E2E_BASE_URL ?? localBaseUrl;
 let web = null;
 let pk = null;
+let analyticsTemp = null;
 let exitCode = 1;
 
 try {
   if (!process.env.E2E_BASE_URL) {
+    analyticsTemp = await mkdtemp(path.join(os.tmpdir(), "aiyiba-e2e-analytics-"));
     const vinextCli = path.join(root, "node_modules", "vinext", "dist", "cli.js");
     web = start(process.execPath, [vinextCli, "dev", "--host", "127.0.0.1", "--port", "3000"], {
       SITE_ORIGIN: localBaseUrl,
       GOOGLE_SITE_VERIFICATION: "test-google-verification",
       BING_SITE_VERIFICATION: "test-bing-verification",
+      ANALYTICS_LOG_DIR: analyticsTemp,
+      ANALYTICS_TRUST_PROXY: "true",
+      ANALYTICS_INGEST_URL: "http://127.0.0.1:3001/analytics",
     });
     pk = start(process.execPath, [path.join(root, "server", "pk-server.mjs")], {
       PK_HOST: "127.0.0.1",
       PK_PORT: "3001",
       PK_ALLOWED_ORIGINS: "http://127.0.0.1:3000",
       PK_DISCONNECT_GRACE_MS: "500",
+      ANALYTICS_LOG_DIR: analyticsTemp,
+      ANALYTICS_TRUST_PROXY: "true",
     });
     await Promise.all([
       waitForHttp(localBaseUrl, web),
@@ -121,7 +129,10 @@ try {
   }
 
   const playwrightCli = path.join(root, "node_modules", "@playwright", "test", "cli.js");
-  const runner = start(process.execPath, [playwrightCli, "test"], { E2E_BASE_URL: baseUrl });
+  const runner = start(process.execPath, [playwrightCli, "test"], {
+    E2E_BASE_URL: baseUrl,
+    E2E_LOCAL_SERVICES: process.env.E2E_BASE_URL ? "0" : "1",
+  });
   const [result] = await once(runner, "exit");
   exitCode = typeof result === "number" ? result : 1;
 } catch (error) {
@@ -130,6 +141,7 @@ try {
 } finally {
   shuttingDown = true;
   await stopAll();
+  if (analyticsTemp) await rm(analyticsTemp, { recursive: true, force: true });
   if (!process.env.E2E_BASE_URL) await clearStaleVinextLock();
 }
 

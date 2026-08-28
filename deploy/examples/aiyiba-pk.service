@@ -17,6 +17,9 @@ Environment=PK_MAX_CONNECTIONS_PER_IP=24
 Environment=PK_MAX_ROOMS=15
 Environment=PK_MAX_ACTIVE_ROOMS_PER_IP=3
 Environment=PK_MAX_ACTIVE_PLAYER_SEATS_PER_IP=8
+# Optional anonymous gameplay analytics. Match the web service directory.
+# Environment=ANALYTICS_LOG_DIR=/srv/aiyiba-analytics
+# Environment=ANALYTICS_TRUST_PROXY=true
 ExecStart=/usr/bin/npm run pk:server
 Restart=on-failure
 RestartSec=5
@@ -25,6 +28,7 @@ PrivateTmp=true
 ProtectHome=true
 ProtectSystem=full
 MemoryMax=256M
+# ReadWritePaths=/srv/aiyiba-analytics
 
 [Install]
 WantedBy=multi-user.target

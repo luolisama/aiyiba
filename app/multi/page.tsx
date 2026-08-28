@@ -11,6 +11,7 @@ import ShareImageDialog from "../share-image-dialog";
 import type { ShareCardModel } from "../share-card";
 import { isExtendedOnlySong } from "../catalog-logic.mjs";
 import { buildPkShareCardModel } from "../share-card-model.mjs";
+import { readAnonymousDeviceId } from "../analytics-client";
 import {
   countTitleCharacters,
   matchesSongQuery,
@@ -166,7 +167,6 @@ const SONGS_BY_POOL: Record<CatalogPool, SearchSong[]> = {
 const STANDARD_BVIDS = new Set(SONGS_BY_POOL.normal.map((song) => song.bvid));
 const SESSION_KEY = "aiyiba-pk-session-v1";
 const NICKNAME_KEY = "aiyiba-pk-nickname-v1";
-const DEVICE_KEY = "aiyiba-pk-device-v1";
 const PENDING_LEAVE_KEY = "aiyiba-pk-pending-leave-v1";
 const PK_STATS_KEY = "aiyiba-pk-stats-v1";
 const PK_GUIDE_SEEN_KEY = "aiyiba-pk-guide-seen-v4";
@@ -206,7 +206,6 @@ const EMPTY_PK_STATS = normalizePkStats(null) as PkStats;
 const pkStatsListeners = new Set<() => void>();
 const pkGuideListeners = new Set<() => void>();
 let pkStatsSnapshot: PkStats | null = null;
-let fallbackDeviceId = "";
 
 function wsUrl() {
   if (typeof window === "undefined") return "";
@@ -257,24 +256,6 @@ function savePendingLeave(value: boolean) {
     else localStorage.removeItem(PENDING_LEAVE_KEY);
   } catch {
     // A reconnect can still finish the leave when storage is unavailable.
-  }
-}
-
-function readDeviceId() {
-  if (fallbackDeviceId) return fallbackDeviceId;
-  try {
-    const existing = localStorage.getItem(DEVICE_KEY)?.trim();
-    if (existing) {
-      fallbackDeviceId = existing;
-      return existing;
-    }
-    const created = globalThis.crypto?.randomUUID?.() ?? `device-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    localStorage.setItem(DEVICE_KEY, created);
-    fallbackDeviceId = created;
-    return created;
-  } catch {
-    fallbackDeviceId = `device-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    return fallbackDeviceId;
   }
 }
 
@@ -742,7 +723,7 @@ export default function PkPage() {
         setConnection("connected");
         if (recovered) setNotice("连接已恢复");
         const session = readSession();
-        if (session) socket.send(JSON.stringify({ type: "room:reconnect", code: session.code, playerToken: session.playerToken, deviceId: readDeviceId() }));
+        if (session) socket.send(JSON.stringify({ type: "room:reconnect", code: session.code, playerToken: session.playerToken, deviceId: readAnonymousDeviceId() }));
         else socket.send(JSON.stringify({ type: "lobby:subscribe" }));
       };
       socket.onmessage = (event) => {
@@ -809,7 +790,7 @@ export default function PkPage() {
       return;
     }
     saveNickname(creatorName);
-    send("room:create", { name: creatorName, mode: "normal", pool: "normal", gameType: "classic", visibility, deviceId: readDeviceId() });
+    send("room:create", { name: creatorName, mode: "normal", pool: "normal", gameType: "classic", visibility, deviceId: readAnonymousDeviceId() });
   }
 
   function updateRoomSettings(mode: GameMode, pool: CatalogPool, gameType: GameType = activeGameType) {
@@ -832,7 +813,7 @@ export default function PkPage() {
       return;
     }
     saveNickname(name.trim());
-    send("room:join", { code: code.trim().toUpperCase(), name: name.trim(), deviceId: readDeviceId() });
+    send("room:join", { code: code.trim().toUpperCase(), name: name.trim(), deviceId: readAnonymousDeviceId() });
   }
 
   function takeOverSession() {
@@ -846,7 +827,7 @@ export default function PkPage() {
     send("room:reconnect", {
       code: session.code,
       playerToken: session.playerToken,
-      deviceId: readDeviceId(),
+      deviceId: readAnonymousDeviceId(),
       takeover: true,
     });
   }

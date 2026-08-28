@@ -27,6 +27,19 @@ npm run build
 `BING_SITE_VERIFICATION`。只填写平台 meta 标签的 `content` 值；两项均为可选，并且必须在 `npm run build`
 前设置，因为 Vinext 会把站点元数据写入构建产物。
 
+匿名玩法统计默认关闭。若要启用，在多人服务设置 `ANALYTICS_LOG_DIR` 为发布目录之外的绝对持久路径，并为
+网页服务设置 `ANALYTICS_INGEST_URL=http://127.0.0.1:3001/analytics`。多人服务统一落盘，网页与多人事件分别
+写入按 UTC 日期切分的 JSONL 文件。`ANALYTICS_INGEST_URL` 和网页侧的 `ANALYTICS_TRUST_PROXY` 需在
+`npm run build` 前设置，以便写入网页 bundle。只有反向代理会覆盖
+`X-Real-IP` 和 `X-Forwarded-For` 时才设置 `ANALYTICS_TRUST_PROXY=true`；否则事件 IP 记为未知或直接连接地址。
+原始文件的访问控制、保留和备份由部署者负责。
+
+汇总脚本只输出聚合结果，例如：
+
+~~~bash
+npm run analytics:summary -- --dir /srv/example-app-analytics --from 2026-08-01 --to 2026-08-31 --format markdown
+~~~
+
 ## 启动
 
 ~~~bash

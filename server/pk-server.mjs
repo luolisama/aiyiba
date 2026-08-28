@@ -11,6 +11,13 @@ import {
 } from "./pk-game.mjs";
 import { ROUND_INVALIDATED_MESSAGE } from "../app/round-errors.mjs";
 import { multiplayerAllowedOriginsFromEnv, siteOriginFromEnv } from "../app/site-origin.mjs";
+import {
+  createMultiplayerAnalyticsEvent,
+  parseClientAnalyticsEvent,
+  sanitizeAnalyticsIp,
+  sanitizeAnalyticsUserAgent,
+} from "../app/analytics-model.mjs";
+import { createAnalyticsSink } from "./analytics-sink.mjs";
 
 const catalog = JSON.parse(await readFile(new URL("../app/data/songs.json", import.meta.url), "utf8"));
 const hardcoreCatalog = JSON.parse(await readFile(new URL("../app/data/hardcore-songs.json", import.meta.url), "utf8"));
@@ -87,6 +94,9 @@ const messageWindowMs = 10_000;
 const maxMessagesPerWindow = 40;
 const heartbeatMs = 30_000;
 const allowedOrigins = new Set(multiplayerAllowedOriginsFromEnv(process.env.PK_ALLOWED_ORIGINS, siteOrigin));
+const webAnalyticsSink = createAnalyticsSink({ source: "web" });
+const multiplayerAnalyticsSink = createAnalyticsSink({ source: "multiplayer" });
+const analyticsTrustProxy = /^(1|true)$/iu.test(process.env.ANALYTICS_TRUST_PROXY ?? "");
 const countdownTimers = new Map();
 const clueStageTimers = new Map();
 const disconnectTimers = new Map();
@@ -96,6 +106,9 @@ const clientConnectionCounts = new Map();
 const activeRoomsByClient = new Map();
 const activePlayerSeatsByClient = new Map();
 const playerClients = new Map();
+const playerAnalyticsIps = new Map();
+const playerUserAgents = new Map();
+const roundAnalyticsParticipants = new Map();
 const roomClients = new Map();
 const roomCreateHistoryByClient = new Map();
 const joinAttemptHistoryByClient = new Map();
@@ -122,6 +135,10 @@ function logPk(event, data = {}) {
 }
 
 const healthServer = createServer((request, response) => {
+  if (request.method === "POST" && request.url === "/analytics") {
+    void handleInternalAnalytics(request, response);
+    return;
+  }
   if (request.method === "POST" && request.url === "/drain") {
     beginDrain();
     response.writeHead(202, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
@@ -149,6 +166,50 @@ const healthServer = createServer((request, response) => {
   response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
   response.end("not found");
 });
+
+async function readInternalJson(request, limit = 8 * 1024) {
+  const chunks = [];
+  let size = 0;
+  for await (const chunk of request) {
+    size += chunk.length;
+    if (size > limit) throw new RangeError("body_too_large");
+    chunks.push(chunk);
+  }
+  return JSON.parse(Buffer.concat(chunks).toString("utf8"));
+}
+
+async function handleInternalAnalytics(request, response) {
+  const remoteAddress = request.socket?.remoteAddress ?? "";
+  if (remoteAddress !== "127.0.0.1" && remoteAddress !== "::1" && remoteAddress !== "::ffff:127.0.0.1") {
+    response.writeHead(403, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
+    response.end(JSON.stringify({ code: "loopback_required" }));
+    return;
+  }
+  if (!request.headers["content-type"]?.toLowerCase().startsWith("application/json")) {
+    response.writeHead(400, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
+    response.end(JSON.stringify({ code: "invalid_content_type" }));
+    return;
+  }
+  try {
+    const value = await readInternalJson(request);
+    const event = parseClientAnalyticsEvent(value?.event);
+    if (!webAnalyticsSink.enabled) {
+      response.writeHead(204, { "cache-control": "no-store" });
+      response.end();
+      return;
+    }
+    await webAnalyticsSink.write(event, {
+      ip: sanitizeAnalyticsIp(value?.observed?.ip),
+      userAgent: sanitizeAnalyticsUserAgent(value?.observed?.userAgent),
+    });
+    response.writeHead(202, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
+    response.end(JSON.stringify({ code: "accepted" }));
+  } catch (error) {
+    const status = error instanceof RangeError ? 413 : 400;
+    response.writeHead(status, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
+    response.end(JSON.stringify({ code: status === 413 ? "body_too_large" : "invalid_event" }));
+  }
+}
 
 const wss = new WebSocketServer({
   server: healthServer,
@@ -214,8 +275,10 @@ function assertPlayerSeatAllowed(clientKey) {
   if (seats >= maxActivePlayerSeatsPerIp) throw new Error("这个网络同时参赛人数太多了，请先结束已有房间");
 }
 
-function trackPlayerSeat(playerId, clientKey) {
+function trackPlayerSeat(playerId, clientKey, analyticsIp = "unknown", userAgent = "") {
   playerClients.set(playerId, clientKey);
+  playerAnalyticsIps.set(playerId, analyticsIp);
+  playerUserAgents.set(playerId, userAgent);
   activePlayerSeatsByClient.set(clientKey, (activePlayerSeatsByClient.get(clientKey) ?? 0) + 1);
 }
 
@@ -223,6 +286,8 @@ function releasePlayerSeat(playerId) {
   const clientKey = playerClients.get(playerId);
   if (!clientKey) return;
   playerClients.delete(playerId);
+  playerAnalyticsIps.delete(playerId);
+  playerUserAgents.delete(playerId);
   const next = (activePlayerSeatsByClient.get(clientKey) ?? 1) - 1;
   if (next > 0) activePlayerSeatsByClient.set(clientKey, next);
   else activePlayerSeatsByClient.delete(clientKey);
@@ -337,6 +402,11 @@ function notifyRoomClosed(closed, message = "房间已解散") {
 }
 
 function broadcastResult(result) {
+  try {
+    recordMultiplayerAnalytics(result);
+  } catch {
+    logPk("analytics_event_rejected", { reason: "invalid_internal_event" });
+  }
   const roomPlayerIds = new Set(result.room ? [...result.room.players.keys()] : []);
   for (const item of result.events ?? []) {
     if (item.target) {
@@ -352,6 +422,75 @@ function broadcastResult(result) {
     clearClueStage(result.room.code);
   }
   scheduleLobbyBroadcast();
+}
+
+function recordMultiplayerAnalytics(result) {
+  if (!multiplayerAnalyticsSink.enabled || !result?.room?.roundId) return;
+  const started = result.events?.some((item) => item.type === "round:started");
+  const completed = result.events?.some((item) => item.type === "round:ended");
+  if (!started && !completed) return;
+  const room = result.room;
+  const event = started ? "game_engaged" : "game_completed";
+  const winnerIds = new Set(room.result?.winnerPlayerIds ?? []);
+  const writes = [];
+  let participants;
+
+  if (started) {
+    participants = [...room.players.values()]
+      .filter((player) => player.deviceId)
+      .map((player) => ({
+        playerId: player.id,
+        visitorId: player.deviceId,
+        ip: playerAnalyticsIps.get(player.id) ?? "unknown",
+        userAgent: playerUserAgents.get(player.id) ?? "",
+      }));
+    roundAnalyticsParticipants.set(room.roundId, participants);
+  } else {
+    participants = roundAnalyticsParticipants.get(room.roundId)
+      ?? [...room.players.values()]
+        .filter((player) => player.deviceId)
+        .map((player) => ({
+          playerId: player.id,
+          visitorId: player.deviceId,
+          ip: playerAnalyticsIps.get(player.id) ?? "unknown",
+          userAgent: playerUserAgents.get(player.id) ?? "",
+        }));
+  }
+
+  for (const participant of participants) {
+    const player = room.players.get(participant.playerId);
+    let outcome = null;
+    if (completed) {
+      if (!winnerIds.size) outcome = "draw";
+      else outcome = winnerIds.has(participant.playerId) ? "win" : "loss";
+    }
+    const attempts = player
+      ? room.gameType === "clues" ? player.clueActions.length : player.attempts.length
+      : 0;
+    let analyticsEvent;
+    try {
+      analyticsEvent = createMultiplayerAnalyticsEvent({
+        event,
+        eventId: `${room.roundId}:${participant.visitorId}:${event}`,
+        visitorId: participant.visitorId,
+        roundId: room.roundId,
+        mode: room.gameType === "clues" ? "multi_clues" : "multi_classic",
+        pool: room.pool,
+        difficulty: room.gameType === "classic" ? room.mode : null,
+        outcome,
+        attempts: completed ? attempts : null,
+      });
+    } catch {
+      continue;
+    }
+    writes.push(multiplayerAnalyticsSink.write(analyticsEvent, {
+      ip: participant.ip,
+      userAgent: participant.userAgent,
+    }));
+  }
+
+  if (completed) roundAnalyticsParticipants.delete(room.roundId);
+  void Promise.all(writes).catch(() => logPk("analytics_write_failed", { event, playerCount: writes.length }));
 }
 
 function scheduleCountdown(room) {
@@ -502,7 +641,7 @@ function handleMessage(socket, context, message) {
       const deviceId = claimAvailableDevice(socket, context, message.deviceId);
       result = manager.createRoom(creatorName, message.mode, message.visibility, deviceId, message.pool, message.gameType);
       trackRoomCreation(result.room.code, context.clientKey);
-      trackPlayerSeat(result.player.id, context.clientKey);
+      trackPlayerSeat(result.player.id, context.clientKey, context.analyticsIp, context.userAgent);
       context.role = "player";
       context.playerId = result.player.id;
       context.code = result.room.code;
@@ -517,7 +656,7 @@ function handleMessage(socket, context, message) {
       assertPlayerSeatAllowed(context.clientKey);
       const deviceId = claimAvailableDevice(socket, context, message.deviceId);
       result = manager.joinRoom(requireText(message.code), requireText(message.name), deviceId);
-      trackPlayerSeat(result.player.id, context.clientKey);
+      trackPlayerSeat(result.player.id, context.clientKey, context.analyticsIp, context.userAgent);
       context.role = "player";
       context.playerId = result.player.id;
       context.code = result.room.code;
@@ -699,6 +838,10 @@ wss.on("connection", (socket, request) => {
     suppressedRejections: 0,
     deviceId: null,
     clientKey,
+    analyticsIp: analyticsTrustProxy
+      ? sanitizeAnalyticsIp(clientKey)
+      : sanitizeAnalyticsIp(request?.socket?.remoteAddress),
+    userAgent: sanitizeAnalyticsUserAgent(request?.headers?.["user-agent"]),
   };
   contexts.set(socket, context);
 

@@ -28,6 +28,96 @@ test("single-player modes keep working after their APIs are blocked", async ({ p
   await expect(page.locator(".timeline-board article")).toHaveCount(2);
 });
 
+test("single-player analytics starts only after meaningful local gameplay", async ({ page }) => {
+  const events = [];
+  let failRequests = false;
+  await page.route("**/api/analytics", async (route) => {
+    events.push(route.request().postDataJSON());
+    if (failRequests) {
+      await route.abort();
+      return;
+    }
+    await route.fulfill({ status: 202, contentType: "application/json", body: JSON.stringify({ code: "accepted" }) });
+  });
+
+  await page.goto("/solo");
+  await dismissGuide(page);
+  await page.waitForTimeout(100);
+  expect(events).toHaveLength(0);
+  const soloSearch = page.getByPlaceholder("输入作品名或拼音搜索…");
+  await soloSearch.fill("dalabengba");
+  await page.getByText("达拉崩吧", { exact: true }).first().click();
+  failRequests = true;
+  await page.getByRole("button", { name: /猜一下/ }).click();
+  await expect.poll(() => events.filter((event) => event.event === "game_engaged").length).toBe(1);
+  await expect(page.locator(".round-meter")).toHaveAttribute("aria-label", /已经猜了 1 次/u);
+  failRequests = false;
+
+  await page.goto("/clues");
+  await dismissGuide(page);
+  await page.getByRole("button", { name: /跳过，下一条/ }).click();
+  await expect.poll(() => events.filter((event) => event.mode === "solo_clues" && event.event === "game_engaged").length).toBe(1);
+
+  await page.goto("/timeline");
+  await dismissGuide(page);
+  await page.getByRole("button", { name: "放在最前" }).click();
+  await expect.poll(() => events.filter((event) => event.mode === "timeline" && event.event === "game_engaged").length).toBe(1);
+
+  expect(events.every((event) => event.schemaVersion === 1 && event.visitorId && event.sessionId && event.roundId)).toBeTruthy();
+  expect(JSON.stringify(events)).not.toMatch(/answer|bvid|nickname|roomCode|playerToken/u);
+
+  for (const route of ["singleplayer", "clues", "timeline"]) {
+    const response = await page.request.get(`/api/${route}`);
+    expect(response.status()).toBe(410);
+  }
+});
+
+test("local analytics endpoint enforces its write-only contract", async ({ request }) => {
+  test.skip(process.env.E2E_LOCAL_SERVICES !== "1", "Do not write synthetic analytics events to a remote target");
+  const payload = {
+    schemaVersion: 1,
+    event: "game_engaged",
+    eventId: "e2e-round-12345678:game_engaged",
+    visitorId: "e2e-device-12345678",
+    sessionId: "e2e-session-12345678",
+    roundId: "e2e-round-12345678",
+    mode: "solo_classic",
+    pool: "normal",
+    difficulty: "normal",
+  };
+  const accepted = await request.post("/api/analytics", {
+    headers: { origin: "http://127.0.0.1:3000", "content-type": "application/json" },
+    data: payload,
+  });
+  expect(accepted.status()).toBe(202);
+
+  const rejectedOrigin = await request.post("/api/analytics", { data: payload });
+  expect(rejectedOrigin.status()).toBe(403);
+  const invalid = await request.post("/api/analytics", {
+    headers: { origin: "http://127.0.0.1:3000", "content-type": "application/json" },
+    data: { ...payload, mode: "unknown" },
+  });
+  expect(invalid.status()).toBe(400);
+  const oversized = await request.post("/api/analytics", {
+    headers: { origin: "http://127.0.0.1:3000", "content-type": "application/json" },
+    data: { ...payload, padding: "x".repeat(5_000) },
+  });
+  expect(oversized.status()).toBe(413);
+  for (let index = 1; index < 30; index += 1) {
+    const response = await request.post("/api/analytics", {
+      headers: { origin: "http://127.0.0.1:3000", "content-type": "application/json" },
+      data: { ...payload, eventId: `e2e-round-${String(index).padStart(8, "0")}:game_engaged`, roundId: `e2e-round-${String(index).padStart(8, "0")}` },
+    });
+    expect(response.status()).toBe(202);
+  }
+  const limited = await request.post("/api/analytics", {
+    headers: { origin: "http://127.0.0.1:3000", "content-type": "application/json" },
+    data: { ...payload, eventId: "e2e-round-rate-limit:game_engaged", roundId: "e2e-round-rate-limit" },
+  });
+  expect(limited.status()).toBe(429);
+  expect((await request.get("/api/analytics")).status()).toBe(405);
+});
+
 test("metadata routes use the running site origin", async ({ page }) => {
   const sitemap = await page.request.get("/sitemap.xml");
   expect(sitemap.ok()).toBeTruthy();
