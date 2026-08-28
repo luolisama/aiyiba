@@ -70,15 +70,20 @@ export function trackGameEvent(input: AnalyticsEvent) {
   sendChain = sendChain
     .catch(() => undefined)
     .then(async () => {
+      const controller = new AbortController();
+      const timeout = globalThis.setTimeout(() => controller.abort(), 3_000);
       try {
         await fetch("/api/analytics", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify(payload),
           keepalive: true,
+          signal: controller.signal,
         });
       } catch {
         // Analytics must never block or change gameplay.
+      } finally {
+        globalThis.clearTimeout(timeout);
       }
     });
 }
