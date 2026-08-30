@@ -147,6 +147,27 @@ html[data-visual-theme="cyber"] .cyber-mode-nav a[aria-current="page"] {
 }
 html[data-visual-theme="cyber"] .cyber-mode-nav a[aria-current="page"]::after { background: var(--mode-color); box-shadow: 3px 0 0 var(--mode-shadow); }
 
+@media (min-width: 1024px) {
+  html[data-visual-theme="cyber"] .cyber-topbar,
+  html[data-visual-theme="cyber"] .cyber-topbar.home-topbar {
+    width: min(1180px, calc(100% - 40px));
+    grid-template-columns: minmax(190px, 1fr) auto minmax(190px, 1fr);
+    gap: 28px;
+  }
+  html[data-visual-theme="cyber"] .cyber-brand { justify-self: start; }
+  html[data-visual-theme="cyber"] .cyber-mode-nav {
+    align-self: start;
+    justify-self: center;
+  }
+  html[data-visual-theme="cyber"] .cyber-mode-nav a {
+    width: 90px;
+    padding-inline: 0;
+    text-align: center;
+  }
+  html[data-visual-theme="cyber"] .cyber-header-actions,
+  html[data-visual-theme="cyber"] .home-header-actions { justify-self: end; }
+}
+
 html[data-visual-theme="cyber"] .cyber-header-actions { min-width: max-content; justify-content: flex-end; }
 html[data-visual-theme="cyber"] .cyber-header-actions .pk-entry-link,
 html[data-visual-theme="cyber"] .cyber-header-actions .icon-button,

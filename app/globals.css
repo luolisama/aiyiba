@@ -16,7 +16,10 @@
 
 * { box-sizing: border-box; }
 
-html { background: var(--paper); }
+html {
+  scrollbar-gutter: stable;
+  background: var(--paper);
+}
 
 body {
   margin: 0;
@@ -565,6 +568,29 @@ footer button { border: 0; padding: 0; background: none; color: var(--accent-dar
   place-items: center;
   padding: 0;
   text-align: center;
+}
+@media (min-width: 1024px) {
+  .classic-topbar:not(.home-topbar),
+  .classic-topbar.home-topbar {
+    width: min(1180px, calc(100% - 40px));
+    grid-template-columns: minmax(190px, 1fr) auto minmax(190px, 1fr);
+    gap: 28px;
+  }
+  .classic-topbar .brand { justify-self: start; }
+  .classic-topbar .classic-mode-nav {
+    align-self: start;
+    justify-self: center;
+  }
+  .classic-topbar .classic-mode-nav a {
+    width: 90px;
+    min-height: 74px;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    text-align: center;
+  }
+  .classic-topbar .header-actions,
+  .classic-topbar .home-header-actions { justify-self: end; }
 }
 .home-rules-link {
   padding: 8px 13px;
