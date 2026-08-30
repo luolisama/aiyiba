@@ -813,14 +813,14 @@ html[data-visual-theme="cyber"] .pk-footer-actions .pk-rules-link { color: var(-
     padding-inline: clamp(6px, 1vw, 12px);
   }
   html[data-visual-theme="cyber"] .home-marquee-group:last-child { display: none; }
+  html[data-visual-theme="cyber"] .home-marquee-group span:nth-child(n + 5) { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) and (min-width: 1024px) {
   html[data-visual-theme="cyber"] .home-marquee-group {
-    min-width: 0;
-    flex: 1 1 50%;
     gap: clamp(8px, 1vw, 18px);
     padding-inline: clamp(6px, .75vw, 14px);
+    font-size: clamp(8px, .7vw, 9px);
   }
-  html[data-visual-theme="cyber"] .home-marquee-group:last-child { display: flex; }
+  html[data-visual-theme="cyber"] .home-marquee-group span:nth-child(n + 5) { display: inline; }
 }

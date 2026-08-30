@@ -43,7 +43,16 @@ const demoRows = [demoSong("达拉崩吧"), demoSong("葬歌")].map((song) => {
 });
 
 const demoLabels = ["作品", "演唱", "引擎", "字数", "日期", "播放"];
-const marqueeWords = ["DALABENGBABA", "GOUZHIQISHI", "JIECAOBAOZALE", "PUTONGDISCO"];
+const marqueeWords = [
+  "DALABENGBA",
+  "GOUZHIQISHI",
+  "PUTONGDISCO",
+  "BAINIAOGUOHETAN",
+  "SHANGSHANGANG",
+  "SHENYESHIREN",
+  "YINYANGXIANSHENG",
+  "SHENJINGBINGZHIGE",
+];
 const anniversarySongs: AnniversarySong[] = hardcoreSongsJson.items.map((song) => ({
   bilibiliUrl: song.bilibiliUrl,
   gameRole: song.gameRole,
