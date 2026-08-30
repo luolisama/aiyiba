@@ -43,6 +43,7 @@ const demoRows = [demoSong("达拉崩吧"), demoSong("葬歌")].map((song) => {
 });
 
 const demoLabels = ["作品", "演唱", "引擎", "字数", "日期", "播放"];
+const marqueeWords = ["DALABENGBABA", "GOUZHIQISHI", "JIECAOBAOZALE", "PUTONGDISCO"];
 const anniversarySongs: AnniversarySong[] = hardcoreSongsJson.items.map((song) => ({
   bilibiliUrl: song.bilibiliUrl,
   gameRole: song.gameRole,
@@ -97,7 +98,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="home-marquee" aria-hidden="true"><div>DALABENGBABA · GOUZHIQISHI · JIECAOBAOZALE · PUTONGDISCO · DALABENGBABA · GOUZHIQISHI · JIECAOBAOZALE · PUTONGDISCO ·</div></div>
+      <div className="home-marquee" aria-hidden="true">
+        <div className="home-marquee-track">
+          {[0, 1].map((group) => (
+            <div className="home-marquee-group" key={group}>
+              {marqueeWords.map((word) => <span key={`${group}-${word}`}>{word}</span>)}
+            </div>
+          ))}
+        </div>
+      </div>
 
       <HomeAnniversary idPrefix="cyber-home" initialDateKey={initialDateKey} songs={anniversarySongs} />
 

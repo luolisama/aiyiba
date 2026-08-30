@@ -257,7 +257,18 @@ html[data-visual-theme="cyber"] .demo-board-status { display: flex; justify-cont
 html[data-visual-theme="cyber"] .demo-board-status span { color: var(--acid); font-family: ui-monospace, monospace; }
 
 html[data-visual-theme="cyber"] .home-marquee { padding: 13px 0; overflow: hidden; border-block: 2px solid var(--acid); color: var(--bg-base); background: var(--acid); transform: rotate(-.35deg); }
-html[data-visual-theme="cyber"] .home-marquee > div { width: max-content; font: 400 9px/1 "Press Start 2P", ui-monospace, monospace; word-spacing: 12px; animation: cyber-marquee 26s linear infinite; }
+html[data-visual-theme="cyber"] .home-marquee-track { display: flex; width: max-content; animation: cyber-marquee 32s linear infinite; }
+html[data-visual-theme="cyber"] .home-marquee-group {
+  min-width: 100vw;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: clamp(12px, 3vw, 44px);
+  padding-inline: clamp(12px, 2vw, 32px);
+  font: 400 9px/1 "Press Start 2P", ui-monospace, monospace;
+}
+html[data-visual-theme="cyber"] .home-marquee-group span { white-space: nowrap; }
 @keyframes cyber-marquee { to { transform: translateX(-50%); } }
 
 html[data-visual-theme="cyber"] .home-anniversary {
@@ -697,7 +708,7 @@ html[data-visual-theme="cyber"] .pk-footer-actions .pk-rules-link { color: var(-
   html[data-visual-theme="cyber"] .demo-board-row > :nth-child(6) { display: none; }
   html[data-visual-theme="cyber"] .demo-board-status { font-size: 8px; }
   html[data-visual-theme="cyber"] .home-marquee { padding-block: 10px; }
-  html[data-visual-theme="cyber"] .home-marquee > div { font-size: 7px; }
+  html[data-visual-theme="cyber"] .home-marquee-group { font-size: 7px; }
 
   html[data-visual-theme="cyber"] .home-modes,
   html[data-visual-theme="cyber"] .home-rules,
@@ -794,4 +805,6 @@ html[data-visual-theme="cyber"] .pk-footer-actions .pk-rules-link { color: var(-
 @media (prefers-reduced-motion: reduce) {
   html[data-visual-theme="cyber"] { scroll-behavior: auto; }
   html[data-visual-theme="cyber"] *, html[data-visual-theme="cyber"] *::before, html[data-visual-theme="cyber"] *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; }
+  html[data-visual-theme="cyber"] .home-marquee-track { animation: none !important; transform: none !important; }
+  html[data-visual-theme="cyber"] .home-marquee-group:last-child { display: none; }
 }
