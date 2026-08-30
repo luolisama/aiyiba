@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { dateKeyInTimeZone, findAnniversarySpotlight } from "../app/anniversary.mjs";
 import { isExtendedOnlySong } from "../app/catalog-logic.mjs";
 
 const catalog = JSON.parse(await readFile(new URL("../app/data/songs.json", import.meta.url), "utf8"));
@@ -79,4 +80,20 @@ test("extended-only works can be identified without labeling standard works", ()
   assert.ok(extendedOnly.every((song) => isExtendedOnlySong("hardcore", song.bvid, standardIds)));
   assert.ok(extendedCatalog.items.filter((song) => standardIds.has(song.bvid)).every((song) => !isExtendedOnlySong("hardcore", song.bvid, standardIds)));
   assert.ok(!isExtendedOnlySong("normal", extendedOnly[0].bvid, standardIds));
+});
+
+test("homepage anniversary uses China time and falls back to the next publication date", () => {
+  assert.equal(dateKeyInTimeZone(new Date("2026-08-29T16:00:00.000Z")), "2026-08-30");
+
+  const upcoming = findAnniversarySpotlight(extendedCatalog.items, "2026-08-30");
+  assert.equal(upcoming.kind, "upcoming");
+  assert.equal(upcoming.daysUntil, 1);
+  assert.equal(upcoming.occurrenceDate, "2026-08-31");
+  assert.deepEqual(upcoming.songs.map((song) => song.name), ["僵尸舞"]);
+  assert.equal(upcoming.songs[0].anniversaryYears, 12);
+
+  const today = findAnniversarySpotlight(extendedCatalog.items, "2026-08-08");
+  assert.equal(today.kind, "today");
+  assert.equal(today.daysUntil, 0);
+  assert.deepEqual(today.songs.map((song) => song.name), ["4分钟！教你制作一段音乐", "石头歌"]);
 });

@@ -260,6 +260,38 @@ html[data-visual-theme="cyber"] .home-marquee { padding: 13px 0; overflow: hidde
 html[data-visual-theme="cyber"] .home-marquee > div { width: max-content; font: 400 9px/1 "Press Start 2P", ui-monospace, monospace; word-spacing: 12px; animation: cyber-marquee 26s linear infinite; }
 @keyframes cyber-marquee { to { transform: translateX(-50%); } }
 
+html[data-visual-theme="cyber"] .home-anniversary {
+  --anniversary-accent: var(--cyan);
+  width: min(1180px, calc(100% - 48px));
+  margin: 56px auto 0;
+  padding: 22px;
+  border: 2px solid var(--anniversary-accent);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: 8px 8px 0 var(--anniversary-accent);
+}
+html[data-visual-theme="cyber"] .home-anniversary.is-today { --anniversary-accent: var(--acid); }
+html[data-visual-theme="cyber"] .anniversary-date {
+  border: 2px solid var(--anniversary-accent);
+  border-radius: var(--r-sm);
+  color: var(--anniversary-accent);
+  background: var(--bg-base);
+  box-shadow: 4px 4px 0 var(--pink);
+}
+html[data-visual-theme="cyber"] .anniversary-date small,
+html[data-visual-theme="cyber"] .anniversary-date span { color: var(--anniversary-accent); font-family: "Press Start 2P", ui-monospace, monospace; }
+html[data-visual-theme="cyber"] .anniversary-date strong { font-family: "ZCOOL QingKe HuangYou", "Microsoft YaHei UI", sans-serif; }
+html[data-visual-theme="cyber"] .anniversary-kicker { color: var(--anniversary-accent); font: 400 8px/1.5 "Press Start 2P", ui-monospace, monospace; }
+html[data-visual-theme="cyber"] .anniversary-content > h2 { color: var(--text-1); font: 900 clamp(27px, 3vw, 38px)/1.08 "ZCOOL QingKe HuangYou", "Microsoft YaHei UI", sans-serif; letter-spacing: -.02em; }
+html[data-visual-theme="cyber"] .anniversary-song-list article { border-color: var(--border); }
+html[data-visual-theme="cyber"] .anniversary-song-list h3 { color: var(--text-1); }
+html[data-visual-theme="cyber"] .anniversary-song-list p { color: var(--text-2); }
+html[data-visual-theme="cyber"] .anniversary-song-list p b,
+html[data-visual-theme="cyber"] .anniversary-song-list article > strong { color: var(--anniversary-accent); }
+html[data-visual-theme="cyber"] .anniversary-song-list a { border: 2px solid var(--anniversary-accent); border-radius: var(--r-sm); color: var(--bg-base); background: var(--anniversary-accent); box-shadow: 3px 3px 0 var(--pink); }
+html[data-visual-theme="cyber"] .anniversary-song-list a:hover { color: var(--bg-base); background: var(--text-1); transform: translate(-1px, -1px); }
+html[data-visual-theme="cyber"] .home-anniversary + .home-modes { padding-top: 72px; }
+
 html[data-visual-theme="cyber"] .home-modes,
 html[data-visual-theme="cyber"] .home-rules { width: min(1180px, calc(100% - 48px)); }
 html[data-visual-theme="cyber"] .home-modes { padding-top: 86px; }
@@ -645,6 +677,8 @@ html[data-visual-theme="cyber"] .pk-footer-actions .pk-rules-link { color: var(-
   html[data-visual-theme="cyber"] .home-hero-english { margin: 18px 0 0; font-size: 8px; }
   html[data-visual-theme="cyber"] .home-hero-copy > .home-hero-intro { margin: 18px 0 0; font-size: 13px; line-height: 1.75; }
   html[data-visual-theme="cyber"] .home-hero-actions { display: grid; gap: 12px; }
+  html[data-visual-theme="cyber"] .home-anniversary { width: calc(100% - 28px); margin-top: 36px; padding: 16px; box-shadow: 5px 5px 0 var(--anniversary-accent); }
+  html[data-visual-theme="cyber"] .anniversary-content > h2 { font-size: 27px; }
   html[data-visual-theme="cyber"] .pixel-cta { min-height: 50px; }
   html[data-visual-theme="cyber"] .pixel-cta.primary { box-shadow: 4px 4px 0 var(--pink); }
   html[data-visual-theme="cyber"] .home-demo-board { padding: 11px; box-shadow: 5px 5px 0 var(--acid); transform: none; }

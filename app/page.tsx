@@ -2,10 +2,13 @@ import type { Metadata } from "next";
 
 import { HomeTopBar } from "./cyber-nav";
 import ClassicHomeContent from "./home-classic";
+import HomeAnniversary, { type AnniversarySong } from "./home-anniversary";
 import { HomeModeGrid, HomeRuleNote, HomeRulesGrid } from "./home-shared";
 import searchSongsJson from "./data/search-songs.json";
 import hardcoreSearchSongsJson from "./data/hardcore-search-songs.json";
 import songsJson from "./data/songs.json";
+import hardcoreSongsJson from "./data/hardcore-songs.json";
+import { dateKeyInTimeZone } from "./anniversary.mjs";
 import { compareSong } from "./game-logic.mjs";
 import { siteOriginFromEnv, siteUrl } from "./site-origin.mjs";
 
@@ -40,10 +43,18 @@ const demoRows = [demoSong("达拉崩吧"), demoSong("葬歌")].map((song) => {
 });
 
 const demoLabels = ["作品", "演唱", "引擎", "字数", "日期", "播放"];
+const anniversarySongs: AnniversarySong[] = hardcoreSongsJson.items.map((song) => ({
+  bilibiliUrl: song.bilibiliUrl,
+  gameRole: song.gameRole,
+  name: song.name,
+  publicationDate: song.publicationDate,
+  vocalists: song.vocalists.join("、"),
+}));
 
 export default function HomePage() {
   const standardCount = searchSongsJson.itemCount;
   const extendedCount = hardcoreSearchSongsJson.itemCount;
+  const initialDateKey = dateKeyInTimeZone(new Date());
   const websiteStructuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -87,6 +98,8 @@ export default function HomePage() {
       </section>
 
       <div className="home-marquee" aria-hidden="true"><div>DALABENGBABA · GOUZHIQISHI · JIECAOBAOZALE · PUTONGDISCO · DALABENGBABA · GOUZHIQISHI · JIECAOBAOZALE · PUTONGDISCO ·</div></div>
+
+      <HomeAnniversary idPrefix="cyber-home" initialDateKey={initialDateKey} songs={anniversarySongs} />
 
       <section className="home-modes" id="modes" aria-labelledby="mode-title">
         <div className="home-section-heading">
@@ -139,7 +152,7 @@ export default function HomePage() {
         <div className="footer-wordmark" aria-hidden="true">AIYIBA</div>
       </footer>
       </div>
-      <ClassicHomeContent />
+      <ClassicHomeContent anniversarySongs={anniversarySongs} initialDateKey={initialDateKey} />
     </main>
   );
 }

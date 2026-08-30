@@ -623,6 +623,70 @@ footer button { border: 0; padding: 0; background: none; color: var(--accent-dar
 }
 .home-hero h1 span { color: var(--accent-dark); }
 .home-hero > p:last-child { max-width: 620px; margin: 25px auto 0; color: var(--muted); line-height: 1.8; }
+.home-anniversary {
+  width: min(1040px, calc(100% - 40px));
+  min-height: 168px;
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 25px;
+  margin: 0 auto 62px;
+  padding: 23px 26px;
+  border: 1px solid var(--line);
+  border-radius: 23px;
+  background: rgb(255 253 247 / 88%);
+  box-shadow: 0 18px 48px rgb(21 29 47 / 9%);
+}
+.anniversary-date {
+  min-height: 112px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-content: center;
+  gap: 4px 6px;
+  padding: 18px;
+  border-radius: 17px;
+  color: white;
+  background: var(--ink);
+  box-shadow: 5px 5px 0 rgb(237 101 71 / 42%);
+}
+.anniversary-date small { grid-column: 1 / -1; color: #ffd7cd; font: 800 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .12em; }
+.anniversary-date strong { font: 900 38px/1 "Noto Serif SC", "Songti SC", serif; }
+.anniversary-date span { align-self: end; padding-bottom: 3px; color: #ffd7cd; font: 900 17px/1 ui-monospace, monospace; }
+.anniversary-content { min-width: 0; }
+.anniversary-kicker { display: block; color: var(--accent-dark); font: 850 11px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .09em; }
+.anniversary-content > h2 { margin: 7px 0 12px; font: 900 clamp(23px, 3vw, 32px)/1.25 "Noto Serif SC", "Songti SC", SimSun, serif; letter-spacing: -.025em; }
+.anniversary-song-list { display: grid; }
+.anniversary-song-list article {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.anniversary-song-list article > div { min-width: 0; }
+.anniversary-song-list h3 { margin: 0; font-size: 16px; overflow-wrap: anywhere; }
+.anniversary-song-list p { margin: 4px 0 0; color: var(--muted); font-size: 11px; line-height: 1.5; }
+.anniversary-song-list p b { color: var(--accent-dark); }
+.anniversary-song-list article > strong { color: var(--accent-dark); font-size: 13px; white-space: nowrap; }
+.anniversary-song-list a {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  background: var(--panel);
+  font-size: 11px;
+  font-weight: 850;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.anniversary-song-list a:hover { border-color: var(--ink); transform: translateY(-1px); }
 .home-modes,
 .home-rules {
   width: min(1040px, calc(100% - 40px));
@@ -1098,6 +1162,31 @@ html:has(.modal-backdrop) { overflow: hidden; }
   .home-hero { width: calc(100% - 28px); margin: 49px auto 38px; }
   .home-hero h1 { font-size: clamp(39px, 12vw, 57px); }
   .home-hero > p:last-child { font-size: 14px; }
+  .home-anniversary {
+    width: calc(100% - 20px);
+    min-height: 0;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-bottom: 44px;
+    padding: 16px;
+    border-radius: 17px;
+  }
+  .anniversary-date {
+    width: 100%;
+    min-height: 58px;
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    padding: 13px 15px;
+    border-radius: 12px;
+  }
+  .anniversary-date small { margin-right: auto; }
+  .anniversary-date strong { font-size: 31px; }
+  .anniversary-date span { align-self: baseline; padding: 0; }
+  .anniversary-content > h2 { margin-top: 8px; font-size: 22px; }
+  .anniversary-song-list article { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
+  .anniversary-song-list article > strong { font-size: 11px; }
+  .anniversary-song-list a { grid-column: 1 / -1; width: 100%; }
   .home-modes, .home-rules { width: calc(100% - 20px); }
   .home-mode-grid { grid-template-columns: 1fr; gap: 12px; }
   .home-mode-card { min-height: 260px; padding: 23px; border-radius: 17px; }

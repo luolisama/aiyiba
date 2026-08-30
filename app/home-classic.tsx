@@ -1,6 +1,12 @@
 import { HomeModeGrid, HomeRuleNote, HomeRulesGrid } from "./home-shared";
+import HomeAnniversary, { type AnniversarySong } from "./home-anniversary";
 
-export default function ClassicHomeContent() {
+type ClassicHomeContentProps = {
+  anniversarySongs: AnniversarySong[];
+  initialDateKey: string;
+};
+
+export default function ClassicHomeContent({ anniversarySongs, initialDateKey }: ClassicHomeContentProps) {
   return (
     <div className="home-classic-view">
       <section className="home-hero" aria-labelledby="classic-home-title">
@@ -8,6 +14,8 @@ export default function ClassicHomeContent() {
         <h1 id="classic-home-title">听过很多遍，<br /><span>你真的认得它吗？</span></h1>
         <p>哎一把是以 ilem 音乐作品为题库的中文猜歌网站；从歌手、引擎、投稿日期和播放等级等线索中，一步步找出正确答案。</p>
       </section>
+
+      <HomeAnniversary idPrefix="classic-home" initialDateKey={initialDateKey} songs={anniversarySongs} />
 
       <section className="home-modes" aria-labelledby="classic-mode-title">
         <div className="home-section-heading">
