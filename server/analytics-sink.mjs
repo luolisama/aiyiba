@@ -6,14 +6,12 @@ const SOURCES = new Set(["web", "multiplayer"]);
 export function analyticsLogDirectoryFromEnv(value = process.env.ANALYTICS_LOG_DIR) {
   const directory = String(value ?? "").trim();
   if (!directory) return null;
-  if (path.win32.isAbsolute(directory)) return path.win32.resolve(directory);
-  if (path.posix.isAbsolute(directory)) return path.posix.resolve(directory);
+  if (path.isAbsolute(directory)) return path.resolve(directory);
   throw new TypeError("ANALYTICS_LOG_DIR must be an absolute path");
 }
 
 export function createAnalyticsSink(options = {}) {
   const directory = analyticsLogDirectoryFromEnv(options.directory);
-  const pathApi = directory && path.win32.isAbsolute(directory) ? path.win32 : path.posix;
   const source = options.source;
   if (!SOURCES.has(source)) throw new TypeError("analytics source is invalid");
 
@@ -30,7 +28,7 @@ export function createAnalyticsSink(options = {}) {
       ip: observed.ip ?? "unknown",
       userAgent: observed.userAgent ?? "",
     };
-    await appendFile(pathApi.join(directory, `${source}-${date}.jsonl`), `${JSON.stringify(record)}\n`, { encoding: "utf8", mode: 0o640 });
+    await appendFile(path.join(directory, `${source}-${date}.jsonl`), `${JSON.stringify(record)}\n`, { encoding: "utf8", mode: 0o640 });
     return true;
   }
 
