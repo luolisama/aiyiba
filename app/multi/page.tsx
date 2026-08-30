@@ -2,12 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { CSSProperties, KeyboardEvent } from "react";
-import Link from "next/link";
 import searchSongsJson from "../data/search-songs.json";
 import songPinyinJson from "../data/song-pinyin.json";
 import hardcoreSearchSongsJson from "../data/hardcore-search-songs.json";
 import hardcoreSongPinyinJson from "../data/hardcore-song-pinyin.json";
 import ShareImageDialog from "../share-image-dialog";
+import { GameTopBar } from "../cyber-nav";
 import type { ShareCardModel } from "../share-card";
 import { isExtendedOnlySong } from "../catalog-logic.mjs";
 import { buildPkShareCardModel } from "../share-card-model.mjs";
@@ -1017,20 +1017,10 @@ export default function PkPage() {
 
   return (
     <main className="pk-shell">
-      <header className="topbar pk-topbar">
-        <div className="brand" aria-label="哎一把">
-          <a className="brand-note" href="https://space.bilibili.com/3379951" target="_blank" rel="noreferrer" aria-label="访问 ilem B站个人主页">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/ilem-avatar.jpg" alt="ilem头像" />
-          </a>
-          <span>哎一把 · 多人模式</span>
-        </div>
-        <div className="pk-topbar-actions">
-          <button type="button" onClick={() => setGuideManuallyOpen(true)}>说明</button>
-          <button type="button" onClick={() => setShowPkStats(true)}>战绩</button>
-          <Link className="pk-back-link" href="/" aria-label="返回主页"><span aria-hidden="true">↩</span><span>主页</span></Link>
-        </div>
-      </header>
+      <GameTopBar activePath="/multi" modeLabel="多人模式" className="pk-topbar">
+          <button className="pk-entry-link" type="button" onClick={() => setGuideManuallyOpen(true)}>说明</button>
+          <button className="pk-entry-link" type="button" onClick={() => setShowPkStats(true)}>战绩</button>
+      </GameTopBar>
 
       {screen === "ended" && isPlayerWinner && (
         <div className="confetti-burst" aria-hidden="true">
@@ -1135,11 +1125,11 @@ export default function PkPage() {
             <div className="pk-clue-stage-head"><div><small>第 {room.clueStage ?? 1} / 6 层 · {CLUE_STAGE_LABELS[Math.max(0, (room.clueStage ?? 1) - 1)]}</small><h3>{room.clueStage === 6 ? "最终抢答" : "看清线索，再决定要不要抢答"}</h3></div><strong>{clueCountdown ?? 0}<small> 秒</small></strong></div>
             <div className="pk-clue-list">{(room.clues ?? []).map((clue) => <div className="pk-clue-item" key={clue.key}><span>{clue.label}</span><strong>{clue.value}</strong></div>)}{!(room.clues ?? []).length && <div className="pk-clue-item muted"><span>第一层线索</span><strong>马上揭示</strong></div>}</div>
             <div className="pk-clue-player-status">{room.players.map((player) => <span key={player.id} className={player.clueSubmitted ? "submitted" : ""}><i />{player.name}{player.id === playerId ? "（你）" : ""}<b>{player.clueSubmitted ? "已提交" : "等待作答"}</b></span>)}</div>
-            <div className="search-row pk-search-row"><div className="search-box"><svg className="search-icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false"><circle cx="10.5" cy="10.5" r="6.25" /><path d="m15.25 15.25 4.5 4.5" /></svg><input value={query} disabled={Boolean(me?.clueSubmitted)} onChange={(event) => { setQuery(event.target.value); setSelectedBvid(null); }} onKeyDown={onSearchKeyDown} placeholder="输入作品名或拼音搜索…" aria-label="搜索线索阶梯作品" autoComplete="off" />{query && !me?.clueSubmitted && <div className="suggestions" role="listbox">{matches.length ? matches.map((song) => <button type="button" role="option" aria-selected={selectedBvid === song.bvid} key={song.bvid} onClick={() => { setSelectedBvid(song.bvid); setQuery(song.name); }}><span>{song.name}</span><small>{song.vocalists.join("、")} · {song.publicationDate.slice(0, 4)}</small></button>) : <p className="no-match">没有找到符合的作品</p>}</div>}</div><button className="guess-button" type="button" disabled={!selectedBvid || guessPending || Boolean(me?.clueSubmitted)} onClick={submitGuess}>{guessPending ? "提交中…" : "抢答"} <span>↵</span></button><button className="pk-skip-button" type="button" disabled={guessPending || Boolean(me?.clueSubmitted)} onClick={skipClue}>跳过</button></div>
+            <div className="search-row pk-search-row"><div className="search-box"><svg className="search-icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false"><circle cx="10.5" cy="10.5" r="6.25" /><path d="m15.25 15.25 4.5 4.5" /></svg><input value={query} disabled={Boolean(me?.clueSubmitted)} onChange={(event) => { setQuery(event.target.value); setSelectedBvid(null); }} onKeyDown={onSearchKeyDown} placeholder="输入作品名或拼音搜索…" enterKeyHint="search" aria-label="搜索线索阶梯作品" autoComplete="off" />{query && !me?.clueSubmitted && <div className="suggestions" role="listbox">{matches.length ? matches.map((song) => <button type="button" role="option" aria-selected={selectedBvid === song.bvid} key={song.bvid} onClick={() => { setSelectedBvid(song.bvid); setQuery(song.name); }}><span>{song.name}</span><small>{song.vocalists.join("、")} · {song.publicationDate.slice(0, 4)}</small></button>) : <p className="no-match">没有找到符合的作品</p>}</div>}</div><button className="guess-button" type="button" disabled={!selectedBvid || guessPending || Boolean(me?.clueSubmitted)} onClick={submitGuess}>{guessPending ? "提交中…" : "抢答"} <span>↵</span></button><button className="pk-skip-button" type="button" disabled={guessPending || Boolean(me?.clueSubmitted)} onClick={skipClue}>跳过</button></div>
             <p className="pk-clue-note">每层只能猜一次或跳过一次；提交内容会在本层结束后一起揭晓。</p>
             {clueActions.length > 0 && <div className="pk-clue-history"><h3>我的操作</h3>{[...clueActions].reverse().map((action) => <div key={`${action.stage}-${action.type}`}><span>第 {action.stage} 层</span><strong>{action.type === "skip" ? "跳过" : action.name ?? "已提交"}</strong></div>)}</div>}
           </div> : <>
-            <div className="search-row pk-search-row"><div className="search-box"><svg className="search-icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false"><circle cx="10.5" cy="10.5" r="6.25" /><path d="m15.25 15.25 4.5 4.5" /></svg><input value={query} onChange={(event) => { setQuery(event.target.value); setSelectedBvid(null); }} onKeyDown={onSearchKeyDown} placeholder="输入作品名或拼音搜索…" aria-label="搜索多人模式作品" autoComplete="off" />{query && <div className="suggestions" role="listbox">{matches.length ? matches.map((song) => <button type="button" role="option" aria-selected={selectedBvid === song.bvid} key={song.bvid} onClick={() => { setSelectedBvid(song.bvid); setQuery(song.name); }}><span>{song.name}</span><small>{song.vocalists.join("、")} · {song.publicationDate.slice(0, 4)}</small></button>) : <p className="no-match">没有找到符合的作品</p>}</div>}</div><button className="guess-button" type="button" disabled={!selectedBvid || guessPending || (me?.attempts ?? 0) >= room.maxGuesses} onClick={submitGuess}>{guessPending ? "提交中…" : "猜一下"} <span>↵</span></button></div>
+            <div className="search-row pk-search-row"><div className="search-box"><svg className="search-icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false"><circle cx="10.5" cy="10.5" r="6.25" /><path d="m15.25 15.25 4.5 4.5" /></svg><input value={query} onChange={(event) => { setQuery(event.target.value); setSelectedBvid(null); }} onKeyDown={onSearchKeyDown} placeholder="输入作品名或拼音搜索…" enterKeyHint="search" aria-label="搜索多人模式作品" autoComplete="off" />{query && <div className="suggestions" role="listbox">{matches.length ? matches.map((song) => <button type="button" role="option" aria-selected={selectedBvid === song.bvid} key={song.bvid} onClick={() => { setSelectedBvid(song.bvid); setQuery(song.name); }}><span>{song.name}</span><small>{song.vocalists.join("、")} · {song.publicationDate.slice(0, 4)}</small></button>) : <p className="no-match">没有找到符合的作品</p>}</div>}</div><button className="guess-button" type="button" disabled={!selectedBvid || guessPending || (me?.attempts ?? 0) >= room.maxGuesses} onClick={submitGuess}>{guessPending ? "提交中…" : "猜一下"} <span>↵</span></button></div>
             <div className="legend"><span><i className="correct" />完全一致</span><span><i className="partial" />部分一致</span><span><i className="wrong" />不一致</span><span className="legend-hint">箭头指向正确答案</span></div>
             <div className="guess-board pk-guess-board"><div className="board-head">{LABELS.map((label) => <span key={label}>{label}</span>)}</div>{[...rows].reverse().map((row, index) => <div className="guess-grid" key={`${row.bvid}-${row.attempt}`} style={{ "--delay": `${index * 45}ms` } as CSSProperties}>{row.cells.map((cell, cellIndex) => <div className={`result-cell ${cell.tone}`} key={`${row.bvid}-${cellIndex}`}><small className="cell-label">{LABELS[cellIndex]}</small><strong>{cell.text || "无"}</strong>{cell.hint && <span className="direction">{cell.hint}</span>}</div>)}</div>)}{!rows.length && <div className="empty-state"><span className="vinyl">♫</span><strong>第一条线索，等你来猜</strong><p>这次要和朋友比速度。</p></div>}</div>
           </>}
@@ -1176,7 +1166,7 @@ export default function PkPage() {
           <span>多人模式 · {GAME_TYPE_RULES[activeGameType].label} · 2–8 人</span>
           <span>题库：{activePoolRules.label} · 播放量快照：{activeCatalog.viewsSnapshotDate ?? "—"}</span>
           <span className="credits">
-            如果对这个项目有什么意见或者数据有误联系<a href="https://space.bilibili.com/477277447/" target="_blank" rel="noreferrer">叁忆玖</a>。记得支持i12喵，关注<a href="https://space.bilibili.com/372295491" target="_blank" rel="noreferrer">站宝</a>喵，关注<a href="https://space.bilibili.com/372295491" target="_blank" rel="noreferrer">站宝</a>谢谢喵！ · 感谢<a href="https://space.bilibili.com/3493105640671353" target="_blank" rel="noreferrer">元应如是</a>提供了数据支持 · 感谢一个坑提供了域名解析帮助
+            如果对这个项目有什么意见或者数据有误联系<a href="https://space.bilibili.com/477277447/" target="_blank" rel="noreferrer">叁忆玖</a>。记得支持i12喵，关注<a href="https://space.bilibili.com/372295491" target="_blank" rel="noreferrer">站宝</a>谢谢喵！ · 感谢<a href="https://space.bilibili.com/3493105640671353" target="_blank" rel="noreferrer">元应如是</a>提供了数据支持 · 感谢一个坑提供了域名解析帮助
           </span>
         </div>
         <div className="pk-footer-actions">

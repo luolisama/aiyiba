@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import clueSearchJson from "../data/clue-search-songs.json";
@@ -17,6 +16,7 @@ import type { ShareCardModel } from "../share-card";
 import { buildClueShareCardModel } from "../share-card-model.mjs";
 import { normalizeClueStats, recordClueResult, resetCluePoolStats } from "./client-logic.mjs";
 import CatalogSelector from "../catalog-selector";
+import { GameTopBar } from "../cyber-nav";
 import { trackGameEvent } from "../analytics-client";
 import {
   actClue,
@@ -400,20 +400,10 @@ export default function ClueLadderPage() {
 
   return (
     <main className="site-shell clue-shell">
-      <header className="topbar">
-        <Link className="brand" href="/" aria-label="返回哎一把主页">
-          <span className="brand-note">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/ilem-avatar.jpg" alt="ilem头像" />
-          </span>
-          <span>哎一把 · 线索阶梯</span>
-        </Link>
-        <div className="header-actions">
+      <GameTopBar activePath="/clues" modeLabel="线索阶梯">
           <button className="pk-entry-link" onClick={() => setShowRules(true)}>说明</button>
           <button className="pk-entry-link" onClick={() => setShowStats(true)}>战绩</button>
-          <Link className="pk-entry-link home-return-link" href="/">↩ 主页</Link>
-        </div>
-      </header>
+      </GameTopBar>
 
       <section className="hero clue-hero">
         <p className="round-status">CLUE LADDER · {poolLabel(pool)}</p>
@@ -445,6 +435,7 @@ export default function ClueLadderPage() {
               onChange={(event) => { setQuery(event.target.value); setSelectedBvid(null); setActiveOption(0); }}
               onKeyDown={onSearchKeyDown}
               placeholder={game.finished ? "本局已结束" : "输入作品名或拼音搜索…"}
+              enterKeyHint="search"
               aria-label="搜索作品"
               autoComplete="off"
             />
@@ -502,7 +493,7 @@ export default function ClueLadderPage() {
       <footer>
         <div className="footer-meta">
           <span>线索阶梯 · {poolLabel(pool)} · 题袋 {game.poolProgress}/{game.poolSize}</span>
-          <span className="credits">如果对这个项目有什么意见或者数据有误联系<a href="https://space.bilibili.com/477277447/" target="_blank" rel="noreferrer">叁忆玖</a>。记得支持i12喵，关注<a href="https://space.bilibili.com/372295491" target="_blank" rel="noreferrer">站宝</a>喵，关注<a href="https://space.bilibili.com/372295491" target="_blank" rel="noreferrer">站宝</a>谢谢喵！</span>
+          <span className="credits">如果对这个项目有什么意见或者数据有误联系<a href="https://space.bilibili.com/477277447/" target="_blank" rel="noreferrer">叁忆玖</a>。记得支持i12喵，关注<a href="https://space.bilibili.com/372295491" target="_blank" rel="noreferrer">站宝</a>谢谢喵！</span>
         </div>
         <button onClick={() => setShowRules(true)}>收录与判定规则</button>
       </footer>
@@ -547,7 +538,7 @@ export default function ClueLadderPage() {
 
       {showResult && game.finished && game.answer && (
         <div className="modal-backdrop result-backdrop" role="presentation">
-          <section className={`modal result-modal ${game.won ? "won" : ""}`} role="dialog" aria-modal="true" aria-labelledby="clue-result-title">
+          <section className={`modal result-modal ${game.won ? "won" : ""}`} role="dialog" aria-modal={shareCard ? undefined : "true"} aria-hidden={shareCard ? "true" : undefined} inert={Boolean(shareCard) || undefined} aria-labelledby="clue-result-title">
             <button className="modal-close" onClick={() => setShowResult(false)} aria-label="暂时关闭">×</button>
             <div className="answer-cover">
               {/* eslint-disable-next-line @next/next/no-img-element */}

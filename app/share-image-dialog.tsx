@@ -10,10 +10,15 @@ type Props = {
 
 export default function ShareImageDialog({ model, onClose }: Props) {
   const dialogRef = useRef<HTMLElement>(null);
+  const onCloseRef = useRef(onClose);
   const [blob, setBlob] = useState<Blob | null>(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [error, setError] = useState("");
   const [sharing, setSharing] = useState(false);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     let active = true;
@@ -37,13 +42,38 @@ export default function ShareImageDialog({ model, onClose }: Props) {
   }, [model]);
 
   useEffect(() => {
-    dialogRef.current?.querySelector<HTMLElement>("button")?.focus();
+    const dialog = dialogRef.current;
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const focusable = () => dialog
+      ? [...dialog.querySelectorAll<HTMLElement>('button, input, textarea, select, a[href], [tabindex]:not([tabindex="-1"])')]
+        .filter((element) => !element.hasAttribute("disabled") && element.getAttribute("aria-hidden") !== "true")
+      : [];
+    focusable()[0]?.focus();
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onCloseRef.current();
+        return;
+      }
+      if (event.key !== "Tab" || !dialog) return;
+      const elements = focusable();
+      if (!elements.length) return;
+      const first = elements[0];
+      const last = elements[elements.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onClose]);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      previousFocus?.focus();
+    };
+  }, []);
 
   const fileName = shareCardFileName(model);
   const file = blob ? new File([blob], fileName, { type: "image/png" }) : null;

@@ -15,3 +15,14 @@
 
 如发现数据错误，或希望更正、注明来源或移除相关内容，请使用仓库的“数据纠错”Issue 表单，也可以联系
 [叁忆玖](https://space.bilibili.com/477277447/)。
+
+## 字体
+
+界面随包分发的 ZCOOL QingKe HuangYou 与 Press Start 2P 字体子集来自 Google Fonts，按 SIL Open Font
+License 1.1 使用和再分发。完整许可文本位于 `public/fonts/`。
+
+## 项目原创插图
+
+`public/images/luo-tianyi-cyber.webp` 是参考洛天依 ACE AI“星空投影”稳定人设特征、为本项目重新
+创作的像素风插图，未直接复制官方立绘或第三方曲绘。插图对洛天依角色外观的引用不代表角色权利已随仓库
+许可证授权；洛天依及相关角色设计权利仍归对应权利人所有。

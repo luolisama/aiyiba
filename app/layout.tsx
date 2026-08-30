@@ -1,6 +1,17 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "./cyber-theme.css";
 import { siteOriginFromEnv, siteVerificationTokenFromEnv } from "./site-origin.mjs";
+import ThemeIntroNotice from "./theme-intro-notice";
+
+const visualThemeBootstrap = `(() => {
+  try {
+    const saved = window.localStorage.getItem("aiyiba-visual-theme");
+    document.documentElement.dataset.visualTheme = saved === "classic" ? "classic" : "cyber";
+  } catch {
+    document.documentElement.dataset.visualTheme = "cyber";
+  }
+})();`;
 
 const siteOrigin = siteOriginFromEnv(process.env.SITE_ORIGIN);
 const googleSiteVerification = siteVerificationTokenFromEnv(
@@ -40,8 +51,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="zh-CN">
-      <body>{children}</body>
+    <html lang="zh-CN" data-visual-theme="cyber" suppressHydrationWarning>
+      <head>
+        <script id="visual-theme-bootstrap" dangerouslySetInnerHTML={{ __html: visualThemeBootstrap }} />
+      </head>
+      <body>
+        {children}
+        <ThemeIntroNotice />
+      </body>
     </html>
   );
 }

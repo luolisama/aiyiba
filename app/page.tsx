@@ -1,13 +1,49 @@
 import type { Metadata } from "next";
 
-import HomeRulesDialog from "./home-rules-dialog";
+import { HomeTopBar } from "./cyber-nav";
+import ClassicHomeContent from "./home-classic";
+import { HomeModeGrid, HomeRuleNote, HomeRulesGrid } from "./home-shared";
+import searchSongsJson from "./data/search-songs.json";
+import hardcoreSearchSongsJson from "./data/hardcore-search-songs.json";
+import songsJson from "./data/songs.json";
+import { compareSong } from "./game-logic.mjs";
 import { siteOriginFromEnv, siteUrl } from "./site-origin.mjs";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
+function demoSong(name: string) {
+  const song = songsJson.items.find((item) => item.name === name);
+  if (!song) throw new Error(`Missing homepage demo song: ${name}`);
+  return song;
+}
+
+function demoTone(tone: string) {
+  if (tone === "correct") return "hit";
+  if (tone === "partial") return "near";
+  return "miss";
+}
+
+const demoAnswer = demoSong("离乡");
+const demoRows = [demoSong("达拉崩吧"), demoSong("葬歌")].map((song) => {
+  const cells = compareSong(song, demoAnswer);
+  const displayCells = cells.map((cell, index) => {
+    const direction = cell.hint?.startsWith("↑") ? " ↑" : cell.hint?.startsWith("↓") ? " ↓" : "";
+    const text = index === 4 ? cell.text.slice(0, 4) : cell.text;
+    return { text: `${text}${direction}`, tone: demoTone(cell.tone) };
+  });
+  return {
+    name: song.name,
+    cells: displayCells,
+  };
+});
+
+const demoLabels = ["作品", "演唱", "引擎", "字数", "日期", "播放"];
+
 export default function HomePage() {
+  const standardCount = searchSongsJson.itemCount;
+  const extendedCount = hardcoreSearchSongsJson.itemCount;
   const websiteStructuredData = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -21,102 +57,75 @@ export default function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteStructuredData).replaceAll("<", "\\u003c") }}
       />
-      <header className="topbar home-topbar">
-        <div className="brand" aria-label="哎一把">
-          <a
-            className="brand-note"
-            href="https://space.bilibili.com/3379951"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="访问 ilem B站个人主页"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/ilem-avatar.jpg" alt="ilem头像" />
-          </a>
-          <span>哎一把</span>
-        </div>
-        <a className="home-rules-link" href="#rules">游戏规则</a>
-      </header>
+      <HomeTopBar />
+      <div className="home-cyber-view">
 
       <section className="home-hero" aria-labelledby="home-title">
-        <p className="home-kicker">猜 ilem 的作品</p>
-        <h1 id="home-title">听过很多遍，<br /><span>你真的认得它吗？</span></h1>
-        <p>哎一把是以 ilem 音乐作品为题库的中文猜歌网站；从歌手、引擎、投稿日期和播放等级等线索中，一步步找出正确答案。</p>
+        <div className="home-hero-copy">
+          <p className="home-kicker"><span>ONLINE</span> ILEM 作品猜歌 · 随时开局</p>
+          <h1 id="home-title">哎一把</h1>
+          <p className="home-hero-english">GUESS THE ILEM SONG</p>
+          <p className="home-hero-intro">从演唱、引擎、投稿日期和播放等级等线索中，一步步锁定 ilem 的作品。一个人推理，或者叫上朋友竞速。</p>
+          <div className="home-hero-actions">
+            <a className="pixel-cta primary" href="/solo">开始猜歌 <span aria-hidden="true">→</span></a>
+            <a className="pixel-cta secondary" href="/multi">多人模式</a>
+          </div>
+        </div>
+        <div className="home-demo-board" aria-label="经典推理判定示意">
+          <div className="demo-board-top"><span>TODAY · NO.127</span><strong>GUESS LOG</strong><i>{6 - demoRows.length} / 6</i></div>
+          <div className="demo-board-head">{demoLabels.map((label) => <span key={label}>{label}</span>)}</div>
+          {demoRows.map((row, rowIndex) => (
+            <div className={`demo-board-row${rowIndex ? " demo-row-secondary" : ""}`} key={row.name}>
+              {row.cells.map((cell, index) => index === 0
+                ? <strong className={cell.tone} key={demoLabels[index]}>{cell.text}</strong>
+                : <span className={cell.tone} key={demoLabels[index]}>{cell.text}</span>)}
+            </div>
+          ))}
+          <div className="demo-board-row current"><strong>下一次猜测</strong>{demoLabels.slice(1).map((label) => <span key={label}>?</span>)}</div>
+          <div className="demo-board-status"><span>● SYSTEM READY</span><strong>第三猜由你决定</strong></div>
+        </div>
       </section>
 
-      <section className="home-modes" aria-labelledby="mode-title">
+      <div className="home-marquee" aria-hidden="true"><div>DALABENGBABA · GOUZHIQISHI · JIECAOBAOZALE · PUTONGDISCO · DALABENGBABA · GOUZHIQISHI · JIECAOBAOZALE · PUTONGDISCO ·</div></div>
+
+      <section className="home-modes" id="modes" aria-labelledby="mode-title">
         <div className="home-section-heading">
-          <span>选择玩法</span>
+          <span>SELECT MODE / 选择玩法</span>
           <h2 id="mode-title">这次想怎么猜？</h2>
         </div>
-        <div className="home-mode-grid">
-          <a className="home-mode-card solo" href="/solo">
-            <div>
-              <span className="home-mode-label">一个人随时开局</span>
-              <h3>经典推理</h3>
-              <p>比较演唱、引擎、日期等六项信息，用颜色与箭头逐步锁定作品。</p>
-            </div>
-            <strong>开始猜歌 <span aria-hidden="true">→</span></strong>
-          </a>
-          <a className="home-mode-card multi" href="/multi">
-            <div>
-              <span className="home-mode-label">叫上朋友一起玩</span>
-              <h3>多人模式</h3>
-              <p>支持 2–8 人同房竞技，由房主选择题库与难度，第一位猜中者获胜。</p>
-            </div>
-            <strong>进入大厅 <span aria-hidden="true">→</span></strong>
-          </a>
-          <a className="home-mode-card clues" href="/clues">
-            <div>
-              <span className="home-mode-label">线索逐层揭晓</span>
-              <h3>线索阶梯</h3>
-              <p>从引擎开始，前四次猜错或跳过会逐步揭示线索，最后一次不再追加提示。</p>
-            </div>
-            <strong>挑战阶梯 <span aria-hidden="true">→</span></strong>
-          </a>
-          <a className="home-mode-card timeline" href="/timeline">
-            <div>
-              <span className="home-mode-label">沿着投稿日期旅行</span>
-              <h3>时光机</h3>
-              <p>连续排列十首作品，把隐藏日期的作品插入正确时间线，放置后立即揭晓真实日期。</p>
-            </div>
-            <strong>启动时光机 <span aria-hidden="true">→</span></strong>
-          </a>
-        </div>
+        <HomeModeGrid variant="cyber" />
       </section>
 
       <section className="home-rules" id="rules" aria-labelledby="rules-title">
         <div className="home-section-heading">
-          <span>游戏规则</span>
-          <h2 id="rules-title">选择适合你的猜法</h2>
-          <p>逐项推理、逐层揭晓、排列年代，或者叫上朋友一起竞速。</p>
+          <span>HOW TO PLAY / 游戏规则</span>
+          <h2 id="rules-title">四步进入状态</h2>
+          <p>选作品、看反馈、跟箭头，再用下一次猜测验证你的推理。</p>
         </div>
-        <div className="home-rule-grid">
-          <article>
-            <span>1</span>
-            <h3>输入作品</h3>
-            <p>支持歌名和拼音搜索，从候选项中选择作品后提交。</p>
-          </article>
-          <article>
-            <span>2</span>
-            <h3>查看颜色</h3>
-            <p><b className="rule-dot correct" />绿色表示完全一致，<b className="rule-dot partial" />黄色表示部分重合。</p>
-          </article>
-          <article>
-            <span>3</span>
-            <h3>跟随箭头</h3>
-            <p>日期、歌名字数和播放等级不一致时，箭头会指向正确方向。</p>
-          </article>
-          <article>
-            <span>4</span>
-            <h3>选择题库</h3>
-            <p>标准题库聚焦主账号投稿；扩展题库补充了ilem/onyk作为staff参与的原创作品和被删除的作品（不包含翻唱和remix）。</p>
-          </article>
+        <HomeRulesGrid />
+        <HomeRuleNote />
+      </section>
+
+      <section className="home-library" id="library" aria-labelledby="library-title">
+        <div>
+          <span className="pixel-kicker">SONG DATABASE</span>
+          <h2 id="library-title">两套题库，同一套推理语言</h2>
+          <p>标准题库聚焦 ilem 主账号音乐投稿；扩展题库补充 staff 原创与已删除作品。搜索、拼音、别名与判定规则完全共用。</p>
+          <div className="library-counts"><strong>{standardCount}<small>标准题库</small></strong><i>+</i><strong>{extendedCount - standardCount}<small>扩展新增</small></strong></div>
         </div>
-        <div className="home-rule-note">
-          <p><strong>普通模式</strong>有 6 次机会。</p>
-          <p><strong>困难模式</strong>有 4 次机会。</p>
-          <HomeRulesDialog />
+        <div className="library-character-art">
+          <span aria-hidden="true">CHARACTER SIGNAL · 66CCFF</span>
+          {/* Vinext's next/image shim currently duplicates React in development; keep this static local asset native. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/luo-tianyi-cyber.webp"
+            alt="参考洛天依 ACE AI 星空投影人设创作的原创像素插画"
+            width={1024}
+            height={1536}
+            loading="lazy"
+            decoding="async"
+          />
+          <b aria-hidden="true">AIYIBA DATABASE</b>
         </div>
       </section>
 
@@ -124,10 +133,13 @@ export default function HomePage() {
         <div className="footer-meta">
           <span>题库：标准题库与扩展题库</span>
           <span className="credits">
-            如果对这个项目有什么意见或者数据有误联系<a href="https://space.bilibili.com/477277447/" target="_blank" rel="noreferrer">叁忆玖</a>。记得支持i12喵，关注<a href="https://space.bilibili.com/372295491" target="_blank" rel="noreferrer">站宝</a>喵，关注<a href="https://space.bilibili.com/372295491" target="_blank" rel="noreferrer">站宝</a>谢谢喵！ · 感谢<a href="https://space.bilibili.com/3493105640671353" target="_blank" rel="noreferrer">元应如是</a>提供了数据支持 · 感谢一个坑提供了域名解析帮助
+            如果对这个项目有什么意见或者数据有误联系<a href="https://space.bilibili.com/477277447/" target="_blank" rel="noreferrer">叁忆玖</a>。记得支持i12喵，关注<a href="https://space.bilibili.com/372295491" target="_blank" rel="noreferrer">站宝</a>谢谢喵！ · 感谢<a href="https://space.bilibili.com/3493105640671353" target="_blank" rel="noreferrer">元应如是</a>提供了数据支持 · 感谢一个坑提供了域名解析帮助
           </span>
         </div>
+        <div className="footer-wordmark" aria-hidden="true">AIYIBA</div>
       </footer>
+      </div>
+      <ClassicHomeContent />
     </main>
   );
 }

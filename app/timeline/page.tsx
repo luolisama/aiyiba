@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import RulesDialog from "../rules-dialog";
 import { useCallback, useEffect, useState } from "react";
 import searchSongsJson from "../data/search-songs.json";
@@ -8,6 +7,7 @@ import hardcoreSearchSongsJson from "../data/hardcore-search-songs.json";
 import songsJson from "../data/songs.json";
 import hardcoreSongsJson from "../data/hardcore-songs.json";
 import CatalogSelector from "../catalog-selector";
+import { GameTopBar } from "../cyber-nav";
 import { trackGameEvent } from "../analytics-client";
 import {
   createTimelineRound,
@@ -238,19 +238,9 @@ export default function TimelinePage() {
 
   return (
     <main className="site-shell timeline-shell">
-      <header className="topbar">
-        <Link className="brand" href="/" aria-label="返回哎一把主页">
-          <span className="brand-note">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/ilem-avatar.jpg" alt="ilem头像" />
-          </span>
-          <span>哎一把 · 时光机</span>
-        </Link>
-        <div className="header-actions">
+      <GameTopBar activePath="/timeline" modeLabel="时光机">
           <button className="pk-entry-link" type="button" onClick={() => setShowRules(true)}>说明</button>
-          <Link className="pk-entry-link home-return-link" href="/">↩ 主页</Link>
-        </div>
-      </header>
+      </GameTopBar>
 
       <section className="hero timeline-hero">
         <p className="round-status">TIME MACHINE · {poolLabel(pool)}</p>

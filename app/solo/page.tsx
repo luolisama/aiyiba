@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import searchSongsJson from "../data/search-songs.json";
 import songPinyinJson from "../data/song-pinyin.json";
 import hardcoreSearchSongsJson from "../data/hardcore-search-songs.json";
@@ -13,6 +12,7 @@ import type { ShareCardModel } from "../share-card";
 import { isExtendedOnlySong } from "../catalog-logic.mjs";
 import { buildSingleShareCardModel } from "../share-card-model.mjs";
 import CatalogSelector from "../catalog-selector";
+import { GameTopBar } from "../cyber-nav";
 import { trackGameEvent } from "../analytics-client";
 import {
   addModeResult,
@@ -624,8 +624,8 @@ export function SinglePlayerPage() {
       : [];
     focusable()[0]?.focus();
     const onKeyDown = (event: KeyboardEvent) => {
+      if (document.querySelector(".share-image-modal")) return;
       if (event.key === "Escape") {
-        if (shareCard) return;
         event.preventDefault();
         if (showRules) dismissRules();
         else if (showStats) setShowStats(false);
@@ -651,7 +651,7 @@ export function SinglePlayerPage() {
       document.removeEventListener("keydown", onKeyDown);
       previousFocus?.focus();
     };
-  }, [dismissRules, modalOpen, shareCard, showRules, showStats, showSurrender, showResult]);
+  }, [dismissRules, modalOpen, showRules, showStats, showSurrender, showResult]);
 
   if (!hydrated || !game || (game.finished && !answer)) {
     if (hydrated && loadError) {
@@ -701,27 +701,10 @@ export function SinglePlayerPage() {
           ))}
         </div>
       )}
-      <header className="topbar">
-        <div className="brand" aria-label="哎一把">
-          <a
-            className="brand-note"
-            href="https://space.bilibili.com/3379951"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="访问 ilem B站个人主页"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/ilem-avatar.jpg" alt="ilem头像" />
-          </a>
-          <span>哎一把 · 经典模式</span>
-        </div>
-        <nav className="header-actions" aria-label="辅助功能">
-          <Link className="pk-entry-link" href="/">主页</Link>
-          <Link className="pk-entry-link" href="/multi">多人模式</Link>
-          <button className="icon-button" onClick={openRules} aria-label="查看玩法">?</button>
-          <button className="icon-button" onClick={() => { setStatsMode(game.mode); setShowStats(true); }} aria-label="查看统计">▥</button>
-        </nav>
-      </header>
+      <GameTopBar activePath="/solo" modeLabel="经典推理">
+          <button className="pk-entry-link" type="button" onClick={openRules}>说明</button>
+          <button className="pk-entry-link" type="button" onClick={() => { setStatsMode(game.mode); setShowStats(true); }}>战绩</button>
+      </GameTopBar>
 
       <section className="hero">
         <h1>听过很多遍，<br /><span>你真的认得它吗？</span></h1>
@@ -769,6 +752,7 @@ export function SinglePlayerPage() {
               }}
               onKeyDown={onSearchKeyDown}
               placeholder={game.finished ? "本局已结束" : "输入作品名或拼音搜索…"}
+              enterKeyHint="search"
               aria-label="搜索作品"
               aria-autocomplete="list"
               autoComplete="off"
@@ -862,7 +846,7 @@ export function SinglePlayerPage() {
           <span>题库：{poolLabel(poolName)} · {catalog.itemCount} 首</span>
           <span>播放量快照：{catalog.viewsSnapshotDate}</span>
           <span className="credits">
-            如果对这个项目有什么意见或者数据有误联系<a href="https://space.bilibili.com/477277447/" target="_blank" rel="noreferrer">叁忆玖</a>。记得支持i12喵，关注<a href="https://space.bilibili.com/372295491" target="_blank" rel="noreferrer">站宝</a>喵，关注<a href="https://space.bilibili.com/372295491" target="_blank" rel="noreferrer">站宝</a>谢谢喵！ · 感谢<a href="https://space.bilibili.com/3493105640671353" target="_blank" rel="noreferrer">元应如是</a>提供了数据支持 · 感谢一个坑提供了域名解析帮助
+            如果对这个项目有什么意见或者数据有误联系<a href="https://space.bilibili.com/477277447/" target="_blank" rel="noreferrer">叁忆玖</a>。记得支持i12喵，关注<a href="https://space.bilibili.com/372295491" target="_blank" rel="noreferrer">站宝</a>谢谢喵！ · 感谢<a href="https://space.bilibili.com/3493105640671353" target="_blank" rel="noreferrer">元应如是</a>提供了数据支持 · 感谢一个坑提供了域名解析帮助
           </span>
         </div>
         <button onClick={openRules}>收录与判定规则</button>
@@ -964,7 +948,7 @@ export function SinglePlayerPage() {
 
       {showResult && game.finished && (
         <div className="modal-backdrop result-backdrop" role="presentation">
-          <section className={`modal result-modal ${game.won ? "won" : ""}`} role="dialog" aria-modal="true" aria-labelledby="result-title">
+          <section className={`modal result-modal ${game.won ? "won" : ""}`} role="dialog" aria-modal={shareCard ? undefined : "true"} aria-hidden={shareCard ? "true" : undefined} inert={Boolean(shareCard) || undefined} aria-labelledby="result-title">
             <button className="modal-close" onClick={() => setShowResult(false)} aria-label="暂时关闭">×</button>
             <div className="answer-cover">
               {/* eslint-disable-next-line @next/next/no-img-element */}
