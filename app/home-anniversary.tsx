@@ -57,8 +57,8 @@ export default function HomeAnniversary({ idPrefix, initialDateKey, songs }: Hom
     <section className={`home-anniversary ${isToday ? "is-today" : "is-upcoming"}`} aria-labelledby={`${idPrefix}-anniversary-title`}>
       <div className="anniversary-date" aria-hidden="true">
         <small>{isToday ? "TODAY" : "NEXT"}</small>
-        <strong>{month}</strong>
-        <span>/ {day}</span>
+        <strong>{month}.{day}</strong>
+        {!isToday && <span>{spotlight.daysUntil} {spotlight.daysUntil === 1 ? "DAY" : "DAYS"}</span>}
       </div>
       <div className="anniversary-content">
         <span className="anniversary-kicker">{isToday ? "TODAY IN ILEM / 历史上的今天" : "NEXT ANNIVERSARY / 下一次投稿纪念日"}</span>

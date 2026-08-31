@@ -291,7 +291,7 @@ html[data-visual-theme="cyber"] .anniversary-date {
 }
 html[data-visual-theme="cyber"] .anniversary-date small,
 html[data-visual-theme="cyber"] .anniversary-date span { color: var(--anniversary-accent); font-family: "Press Start 2P", ui-monospace, monospace; }
-html[data-visual-theme="cyber"] .anniversary-date strong { font-family: "ZCOOL QingKe HuangYou", "Microsoft YaHei UI", sans-serif; }
+html[data-visual-theme="cyber"] .anniversary-date strong { font: 400 22px/1.2 "Press Start 2P", ui-monospace, monospace; letter-spacing: -.04em; }
 html[data-visual-theme="cyber"] .anniversary-kicker { color: var(--anniversary-accent); font: 400 8px/1.5 "Press Start 2P", ui-monospace, monospace; }
 html[data-visual-theme="cyber"] .anniversary-content > h2 { color: var(--text-1); font: 900 clamp(27px, 3vw, 38px)/1.08 "ZCOOL QingKe HuangYou", "Microsoft YaHei UI", sans-serif; letter-spacing: -.02em; }
 html[data-visual-theme="cyber"] .anniversary-song-list article { border-color: var(--border); }

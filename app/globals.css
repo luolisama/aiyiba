@@ -639,19 +639,20 @@ footer button { border: 0; padding: 0; background: none; color: var(--accent-dar
 }
 .anniversary-date {
   min-height: 112px;
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-content: center;
-  gap: 4px 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   padding: 18px;
   border-radius: 17px;
   color: white;
   background: var(--ink);
   box-shadow: 5px 5px 0 rgb(237 101 71 / 42%);
 }
-.anniversary-date small { grid-column: 1 / -1; color: #ffd7cd; font: 800 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .12em; }
-.anniversary-date strong { font: 900 38px/1 "Noto Serif SC", "Songti SC", serif; }
-.anniversary-date span { align-self: end; padding-bottom: 3px; color: #ffd7cd; font: 900 17px/1 ui-monospace, monospace; }
+.anniversary-date small { color: #ffd7cd; font: 800 10px/1 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .12em; }
+.anniversary-date strong { white-space: nowrap; font: 900 30px/1 "Noto Serif SC", "Songti SC", serif; }
+.anniversary-date span { color: #ffd7cd; font: 900 10px/1 ui-monospace, monospace; letter-spacing: .08em; }
 .anniversary-content { min-width: 0; }
 .anniversary-kicker { display: block; color: var(--accent-dark); font: 850 11px/1.4 ui-monospace, SFMono-Regular, Consolas, monospace; letter-spacing: .09em; }
 .anniversary-content > h2 { margin: 7px 0 12px; font: 900 clamp(23px, 3vw, 32px)/1.25 "Noto Serif SC", "Songti SC", SimSun, serif; letter-spacing: -.025em; }
@@ -1174,15 +1175,15 @@ html:has(.modal-backdrop) { overflow: hidden; }
   .anniversary-date {
     width: 100%;
     min-height: 58px;
-    display: flex;
+    flex-direction: row;
     align-items: baseline;
+    justify-content: flex-start;
     gap: 7px;
     padding: 13px 15px;
     border-radius: 12px;
   }
   .anniversary-date small { margin-right: auto; }
-  .anniversary-date strong { font-size: 31px; }
-  .anniversary-date span { align-self: baseline; padding: 0; }
+  .anniversary-date strong { font-size: 27px; }
   .anniversary-content > h2 { margin-top: 8px; font-size: 22px; }
   .anniversary-song-list article { grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
   .anniversary-song-list article > strong { font-size: 11px; }
