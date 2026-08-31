@@ -701,7 +701,7 @@ export function SinglePlayerPage() {
           ))}
         </div>
       )}
-      <GameTopBar activePath="/solo" modeLabel="经典推理">
+      <GameTopBar activePath="/solo" catalog={poolName} modeLabel="经典推理">
           <button className="pk-entry-link" type="button" onClick={openRules}>说明</button>
           <button className="pk-entry-link" type="button" onClick={() => { setStatsMode(game.mode); setShowStats(true); }}>战绩</button>
       </GameTopBar>

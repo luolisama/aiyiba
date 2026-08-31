@@ -1,6 +1,7 @@
+import { realpathSync } from "node:fs";
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
   createMultiplayerAnalyticsEvent,
@@ -31,12 +32,18 @@ function argumentsFrom(argv) {
     else throw new Error(`Unknown argument: ${name}`);
   }
   if (!result.directory || !path.isAbsolute(result.directory)) throw new Error("--dir must be an absolute path");
-  if (!/^\d{4}-\d{2}-\d{2}$/u.test(result.from) || !/^\d{4}-\d{2}-\d{2}$/u.test(result.to)) {
+  if (!isCalendarDate(result.from) || !isCalendarDate(result.to)) {
     throw new Error("--from and --to must use YYYY-MM-DD");
   }
   if (result.from > result.to) throw new Error("--from must not be after --to");
   if (!new Set(["json", "markdown"]).has(result.format)) throw new Error("--format must be json or markdown");
   return result;
+}
+
+function isCalendarDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/u.test(value)) return false;
+  const parsed = new Date(`${value}T00:00:00.000Z`);
+  return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
 }
 
 function normalizeStoredEvent(value, from, to, expectedSource) {
@@ -126,7 +133,16 @@ async function main() {
   process.stdout.write(options.format === "markdown" ? `${analyticsSummaryMarkdown(summary)}\n` : `${JSON.stringify(summary, null, 2)}\n`);
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+function isMainModule() {
+  if (!process.argv[1]) return false;
+  try {
+    return pathToFileURL(realpathSync(process.argv[1])).href === pathToFileURL(realpathSync(fileURLToPath(import.meta.url))).href;
+  } catch {
+    return import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href;
+  }
+}
+
+if (isMainModule()) {
   main().catch((error) => {
     console.error(error instanceof Error ? error.message : String(error));
     process.exitCode = 1;

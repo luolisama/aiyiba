@@ -19,7 +19,7 @@ export function createRequestRateLimiter(options = {}) {
 
   function consume(rawKey) {
     const current = now();
-    if (current >= nextCleanupAt || buckets.size >= maxEntries) cleanup(current);
+    if (current >= nextCleanupAt) cleanup(current);
     const key = String(rawKey || "unknown").slice(0, 160);
     const existing = buckets.get(key);
     if (!existing) {

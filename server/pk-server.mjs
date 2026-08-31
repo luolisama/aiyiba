@@ -18,6 +18,7 @@ import {
   sanitizeAnalyticsUserAgent,
 } from "../app/analytics-model.mjs";
 import { createAnalyticsSink } from "./analytics-sink.mjs";
+import { createRequestRateLimiter } from "./request-rate-limiter.mjs";
 
 const catalog = JSON.parse(await readFile(new URL("../app/data/songs.json", import.meta.url), "utf8"));
 const hardcoreCatalog = JSON.parse(await readFile(new URL("../app/data/hardcore-songs.json", import.meta.url), "utf8"));
@@ -92,6 +93,7 @@ const roomAlertRatio = Number.isFinite(configuredRoomAlertRatio) && configuredRo
   : 0.8;
 const messageWindowMs = 10_000;
 const maxMessagesPerWindow = 40;
+const maxSocketBufferedBytes = 512 * 1024;
 const heartbeatMs = 30_000;
 const allowedOrigins = new Set(multiplayerAllowedOriginsFromEnv(process.env.PK_ALLOWED_ORIGINS, siteOrigin));
 const webAnalyticsSink = createAnalyticsSink({ source: "web" });
@@ -110,8 +112,16 @@ const playerAnalyticsIps = new Map();
 const playerUserAgents = new Map();
 const roundAnalyticsParticipants = new Map();
 const roomClients = new Map();
-const roomCreateHistoryByClient = new Map();
-const joinAttemptHistoryByClient = new Map();
+const roomCreateLimiter = createRequestRateLimiter({
+  windowMs: roomCreateWindowMs,
+  limit: maxRoomCreatesPerWindow,
+  maxEntries: 5_000,
+});
+const joinAttemptLimiter = createRequestRateLimiter({
+  windowMs: joinAttemptWindowMs,
+  limit: joinAttemptsPerWindow,
+  maxEntries: 5_000,
+});
 const manager = createPkManager({ normal: catalog, hardcore: hardcoreCatalog }, {
   maxRooms,
   countdownMs,
@@ -140,12 +150,14 @@ const healthServer = createServer((request, response) => {
     return;
   }
   if (request.method === "POST" && request.url === "/drain") {
+    if (!requireLoopback(request, response)) return;
     beginDrain();
     response.writeHead(202, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
     response.end(JSON.stringify({ status: "draining", roomCount: manager.roomCount() }));
     return;
   }
   if (request.method === "POST" && request.url === "/resume") {
+    if (!requireLoopback(request, response)) return;
     resumeFromDrain();
     response.writeHead(200, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
     response.end(JSON.stringify({ status: draining ? "draining" : "ok", roomCount: manager.roomCount() }));
@@ -179,12 +191,7 @@ async function readInternalJson(request, limit = 8 * 1024) {
 }
 
 async function handleInternalAnalytics(request, response) {
-  const remoteAddress = request.socket?.remoteAddress ?? "";
-  if (remoteAddress !== "127.0.0.1" && remoteAddress !== "::1" && remoteAddress !== "::ffff:127.0.0.1") {
-    response.writeHead(403, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
-    response.end(JSON.stringify({ code: "loopback_required" }));
-    return;
-  }
+  if (!requireLoopback(request, response)) return;
   if (!request.headers["content-type"]?.toLowerCase().startsWith("application/json")) {
     response.writeHead(400, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
     response.end(JSON.stringify({ code: "invalid_content_type" }));
@@ -229,14 +236,25 @@ const wss = new WebSocketServer({
 });
 
 function getClientKey(request) {
-  // Nginx overwrites X-Real-IP with the address it observed before proxying.
-  // Prefer it so all tabs behind one public address share the same limit.
-  const realIp = request?.headers?.["x-real-ip"];
-  if (typeof realIp === "string" && realIp.trim()) return realIp.trim();
-  const forwarded = request?.headers?.["x-forwarded-for"];
-  const forwardedValue = Array.isArray(forwarded) ? forwarded[0] : forwarded;
-  const firstForwarded = typeof forwardedValue === "string" ? forwardedValue.split(",")[0].trim() : "";
-  return firstForwarded || request?.socket?.remoteAddress || "unknown";
+  const remoteAddress = request?.socket?.remoteAddress || "unknown";
+  // Only a loopback reverse proxy can supply the client address. The example
+  // Nginx configuration overwrites X-Real-IP rather than forwarding user input.
+  if (isLoopbackAddress(remoteAddress)) {
+    const realIp = request?.headers?.["x-real-ip"];
+    if (typeof realIp === "string" && realIp.trim()) return sanitizeAnalyticsIp(realIp);
+  }
+  return sanitizeAnalyticsIp(remoteAddress);
+}
+
+function isLoopbackAddress(value) {
+  return value === "127.0.0.1" || value === "::1" || value === "::ffff:127.0.0.1";
+}
+
+function requireLoopback(request, response) {
+  if (isLoopbackAddress(request.socket?.remoteAddress ?? "")) return true;
+  response.writeHead(403, { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" });
+  response.end(JSON.stringify({ code: "loopback_required" }));
+  return false;
 }
 
 function incrementClientConnection(clientKey) {
@@ -249,22 +267,13 @@ function decrementClientConnection(clientKey) {
   else clientConnectionCounts.delete(clientKey);
 }
 
-function roomCreationHistory(clientKey) {
-  const cutoff = Date.now() - roomCreateWindowMs;
-  const history = (roomCreateHistoryByClient.get(clientKey) ?? []).filter((timestamp) => timestamp > cutoff);
-  if (history.length) roomCreateHistoryByClient.set(clientKey, history);
-  else roomCreateHistoryByClient.delete(clientKey);
-  return history;
-}
-
 function assertRoomCreationAllowed(clientKey) {
   const activeRooms = activeRoomsByClient.get(clientKey) ?? 0;
   if (activeRooms >= maxActiveRoomsPerIp) {
     blockedRoomCreations += 1;
     throw new Error("这个网络创建的多人房间太多了，请先结束已有房间");
   }
-  const history = roomCreationHistory(clientKey);
-  if (history.length >= maxRoomCreatesPerWindow) {
+  if (!roomCreateLimiter.consume(clientKey)) {
     blockedRoomCreations += 1;
     throw new Error("创建房间太频繁，请稍后再试");
   }
@@ -294,26 +303,12 @@ function releasePlayerSeat(playerId) {
 }
 
 function assertJoinAttemptAllowed(clientKey) {
-  if (joinAttemptHistoryByClient.size > 5_000) {
-    const cutoff = Date.now() - joinAttemptWindowMs;
-    for (const [key, timestamps] of joinAttemptHistoryByClient) {
-      if (!timestamps.some((timestamp) => timestamp > cutoff)) joinAttemptHistoryByClient.delete(key);
-      if (joinAttemptHistoryByClient.size <= 4_000) break;
-    }
-  }
-  const cutoff = Date.now() - joinAttemptWindowMs;
-  const history = (joinAttemptHistoryByClient.get(clientKey) ?? []).filter((timestamp) => timestamp > cutoff);
-  history.push(Date.now());
-  joinAttemptHistoryByClient.set(clientKey, history);
-  if (history.length > joinAttemptsPerWindow) throw new Error("加入房间尝试过于频繁，请稍后再试");
+  if (!joinAttemptLimiter.consume(clientKey)) throw new Error("加入房间尝试过于频繁，请稍后再试");
 }
 
 function trackRoomCreation(code, clientKey) {
   roomClients.set(code, clientKey);
   activeRoomsByClient.set(clientKey, (activeRoomsByClient.get(clientKey) ?? 0) + 1);
-  const history = roomCreationHistory(clientKey);
-  history.push(Date.now());
-  roomCreateHistoryByClient.set(clientKey, history);
 }
 
 function releaseRoom(code) {
@@ -326,7 +321,12 @@ function releaseRoom(code) {
 }
 
 function send(socket, type, data = {}) {
-  if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type, ...data }));
+  if (socket?.readyState !== WebSocket.OPEN) return;
+  if (socket.bufferedAmount > maxSocketBufferedBytes) {
+    socket.close(1013, "client too slow");
+    return;
+  }
+  socket.send(JSON.stringify({ type, ...data }));
 }
 
 function lobbySnapshot() {
@@ -384,6 +384,7 @@ function clearContext(socket, context) {
 
 function notifyRoomClosed(closed, message = "房间已解散") {
   if (!closed) return;
+  if (closed.roundId) roundAnalyticsParticipants.delete(closed.roundId);
   releaseRoom(closed.code);
   for (const playerId of closed.playerIds ?? []) releasePlayerSeat(playerId);
   clearCountdown(closed.code);
@@ -707,9 +708,7 @@ function handleMessage(socket, context, message) {
       leaveLobby(socket);
       if (previousSocket && previousSocket !== socket && previousSocket.readyState === WebSocket.OPEN) previousSocket.close(4001, "reconnected");
       send(socket, "room:reconnected", { code: result.room.code, playerId: result.player.id, room: manager.publicState(result.room) });
-      for (const item of result.events ?? []) {
-        if (!item.target || item.target === result.player.id) send(socket, item.type, item.data);
-      }
+      broadcastResult(result);
       logPk("room_reconnected", { status: result.room.status, takeover: Boolean(message.takeover) });
       break;
     }
@@ -765,7 +764,7 @@ function handleMessage(socket, context, message) {
       }
       clearDisconnect(result.kickedPlayerId);
       releasePlayerSeat(result.kickedPlayerId);
-      logPk("player_kicked", { roomCode: context.code, roomCount: manager.roomCount() });
+      logPk("player_kicked", { roomCount: manager.roomCount() });
       break;
     }
     case "guess:submit":

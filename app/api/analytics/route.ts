@@ -7,7 +7,9 @@ import {
 import { siteOriginFromEnv } from "../../site-origin.mjs";
 
 const MAX_BODY_BYTES = 4 * 1024;
-const limiter = createRequestRateLimiter({ windowMs: 60_000, limit: 30, maxEntries: 10_000 });
+const visitorLimiter = createRequestRateLimiter({ windowMs: 60_000, limit: 30, maxEntries: 10_000 });
+const sourceLimiter = createRequestRateLimiter({ windowMs: 60_000, limit: 120, maxEntries: 5_000 });
+const globalLimiter = createRequestRateLimiter({ windowMs: 60_000, limit: 3_000, maxEntries: 1 });
 const siteOrigin = siteOriginFromEnv(process.env.SITE_ORIGIN);
 const trustProxy = /^(1|true)$/iu.test(process.env.ANALYTICS_TRUST_PROXY ?? "");
 const ingestUrl = (process.env.ANALYTICS_INGEST_URL ?? "").trim();
@@ -73,8 +75,15 @@ export async function POST(request: Request) {
     return jsonResponse(400, "invalid_event");
   }
   if (!ingestUrl) return new Response(null, { status: 204, headers: { "cache-control": "no-store" } });
-  if (!limiter.consume(event.visitorId)) return jsonResponse(429, "rate_limited");
+  const sourceIp = observedIp(request);
+  if (!globalLimiter.consume("all")
+    || (sourceIp !== "unknown" && !sourceLimiter.consume(sourceIp))
+    || !visitorLimiter.consume(event.visitorId)) {
+    return jsonResponse(429, "rate_limited");
+  }
 
+  const controller = new AbortController();
+  const timeout = globalThis.setTimeout(() => controller.abort(), 3_000);
   try {
     const response = await fetch(ingestUrl, {
       method: "POST",
@@ -86,11 +95,14 @@ export async function POST(request: Request) {
           userAgent: sanitizeAnalyticsUserAgent(request.headers.get("user-agent")),
         },
       }),
+      signal: controller.signal,
     });
     if (response.status !== 202) throw new Error("analytics ingest rejected the event");
     return jsonResponse(202, "accepted");
   } catch {
     return jsonResponse(500, "write_failed");
+  } finally {
+    globalThis.clearTimeout(timeout);
   }
 }
 

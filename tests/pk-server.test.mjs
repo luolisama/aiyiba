@@ -198,6 +198,35 @@ test("reconnect after disconnect expiry returns a deduplicated loss summary", as
   assert.match(summary.message, /记为失败/);
 });
 
+test("reconnect broadcasts the restored connection state to the room", async (context) => {
+  const server = await startServer(context, { PK_DISCONNECT_GRACE_MS: "1000" });
+  const host = await connect(server.port);
+  const guest = await connect(server.port);
+  server.clients.push(host, guest);
+
+  host.send("room:create", { name: "重连房主", visibility: "private", deviceId: "reconnect-host" });
+  const created = await host.wait("room:created");
+  guest.send("room:join", { code: created.code, name: "重连访客", deviceId: "reconnect-guest" });
+  const joined = await guest.wait("room:joined");
+
+  await new Promise((resolve) => {
+    guest.socket.once("close", resolve);
+    guest.socket.close();
+  });
+  await host.wait("room:state", 3_000, (message) => message.players.some((player) => player.id === joined.playerId && !player.connected));
+
+  const recovered = await connect(server.port);
+  server.clients.push(recovered);
+  recovered.send("room:reconnect", {
+    code: created.code,
+    playerToken: joined.playerToken,
+    deviceId: "reconnect-guest",
+  });
+  await recovered.wait("room:reconnected");
+  const restored = await host.wait("room:state", 3_000, (message) => message.players.some((player) => player.id === joined.playerId && player.connected));
+  assert.equal(restored.players.find((player) => player.id === joined.playerId).connected, true);
+});
+
 test("requires a nickname to create, supports host kicking, and has no spectator or matchmaking protocol", async (context) => {
   const server = await startServer(context);
   const host = await connect(server.port);
@@ -219,6 +248,7 @@ test("requires a nickname to create, supports host kicking, and has no spectator
   ]);
   assert.match(kicked.message, /移出/);
   assert.equal(updated.players.length, 1);
+  assert.doesNotMatch(server.getLog(), new RegExp(created.code));
 
   extra.send("room:spectate", { code: created.code, deviceId: "spectator-device" });
   assert.match((await extra.wait("error")).message, /不支持/);

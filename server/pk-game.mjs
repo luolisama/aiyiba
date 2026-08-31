@@ -299,7 +299,7 @@ export function createPkManager(catalog, options = {}) {
       player.deviceId = null;
     }
     rooms.delete(room.code);
-    return { room: null, closed: { code: room.code, reason, playerIds }, events: [] };
+    return { room: null, closed: { code: room.code, reason, playerIds, roundId: room.roundId }, events: [] };
   }
 
   function stateEvents(room) {
@@ -682,8 +682,9 @@ export function createPkManager(catalog, options = {}) {
     if (room.status !== "playing") throw new Error("当前还不能提交答案");
     if (!player.connected) throw new Error("连接已断开，请重新连接");
     if (player.left || player.forfeited) throw new Error("你已经退出本轮");
-    if (player.clueActions.some((action) => action.stage === room.clueStage)) throw new Error("这一层已经操作过了");
     const currentTime = now();
+    if (room.stageEndsAt && currentTime >= room.stageEndsAt) throw new Error("本阶段已经结束，请等待下一条线索");
+    if (player.clueActions.some((action) => action.stage === room.clueStage)) throw new Error("这一层已经操作过了");
     if (startGraceMs > 0 && room.startAt && currentTime - room.startAt < startGraceMs) throw new Error("请等倒计时结束后再猜");
     if (guessIntervalMs > 0 && currentTime - player.lastGuessAt < guessIntervalMs) throw new Error("猜得太快了，请稍等一下");
     const { byBvid } = catalogFor(room.pool);
@@ -894,7 +895,7 @@ export function createPkManager(catalog, options = {}) {
       const ttl = room.status === "lobby" ? Math.min(roomTtlMs, lobbyRoomTtlMs) : roomTtlMs;
       if (current - room.lastActivity > ttl || current - room.createdAt > absoluteRoomTtlMs) {
         rooms.delete(code);
-        expired.push({ code, playerIds: [...room.players.keys()] });
+        expired.push({ code, playerIds: [...room.players.keys()], roundId: room.roundId });
       }
     }
     return expired;

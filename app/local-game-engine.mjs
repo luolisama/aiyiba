@@ -106,14 +106,16 @@ export function createClassicRound({ pool = "normal", mode = "normal", songs, sh
 /** @param {string | null | undefined} expectedPool */
 export function restoreClassicRound(raw, songs, expectedPool = null) {
   if (!raw || raw.schemaVersion !== LOCAL_CLASSIC_SCHEMA_VERSION || !Array.isArray(raw.guessBvids)) return null;
+  if (typeof raw.roundId !== "string" || !raw.roundId) return null;
   if (expectedPool && normalizePool(raw.pool) !== normalizePool(expectedPool)) return null;
   const catalog = byBvid(songs);
   if (typeof raw.answerBvid !== "string" || !catalog.has(raw.answerBvid)) return null;
   const mode = normalizeMode(raw.mode);
   const maxGuesses = CLASSIC_MAX_GUESSES[mode];
   const guessBvids = [...new Set(raw.guessBvids.filter((bvid) => typeof bvid === "string" && catalog.has(bvid)))].slice(0, maxGuesses);
-  const won = raw.won === true || guessBvids.includes(raw.answerBvid);
-  const finished = raw.finished === true || won || guessBvids.length >= maxGuesses;
+  const won = guessBvids.includes(raw.answerBvid);
+  const surrendered = raw.finished === true && raw.finishReason === "surrender" && !won;
+  const finished = surrendered || won || guessBvids.length >= maxGuesses;
   const state = {
     ...raw,
     pool: normalizePool(raw.pool),
@@ -186,6 +188,7 @@ export function createClueRound({ pool = "normal", songs, shoe = null, nextIndex
 /** @param {string | null | undefined} expectedPool */
 export function restoreClueRound(raw, songs, expectedPool = null) {
   if (!raw || raw.schemaVersion !== LOCAL_CLUE_SCHEMA_VERSION || !Array.isArray(raw.actions)) return null;
+  if (typeof raw.roundId !== "string" || !raw.roundId) return null;
   if (expectedPool && normalizePool(raw.pool) !== normalizePool(expectedPool)) return null;
   if (typeof raw.answerBvid !== "string" || !byBvid(songs).has(raw.answerBvid)) return null;
   const catalog = byBvid(songs);
@@ -198,8 +201,9 @@ export function restoreClueRound(raw, songs, expectedPool = null) {
     name: action.type === "guess" ? catalog.get(action.bvid).name : undefined,
     correct: action.type === "guess" && action.bvid === raw.answerBvid,
   }));
-  const won = raw.won === true || actions.some((action) => action.correct);
-  const finished = raw.finished === true || won || actions.length >= CLUE_MAX_ATTEMPTS;
+  const won = actions.some((action) => action.correct);
+  const surrendered = raw.finished === true && raw.finishReason === "surrender" && !won;
+  const finished = surrendered || won || actions.length >= CLUE_MAX_ATTEMPTS;
   return clueView({
     ...raw,
     pool: normalizePool(raw.pool),
@@ -288,20 +292,32 @@ export function createTimelineRound({ pool = "normal", songs, nextIndex = secure
 /** @param {string | null | undefined} expectedPool */
 export function restoreTimelineRound(raw, songs, expectedPool = null) {
   if (!raw || raw.schemaVersion !== LOCAL_TIMELINE_SCHEMA_VERSION || !Array.isArray(raw.targetBvids) || !Array.isArray(raw.timeline) || !Array.isArray(raw.placements)) return null;
+  if (typeof raw.roundId !== "string" || !raw.roundId) return null;
   if (expectedPool && normalizePool(raw.pool) !== normalizePool(expectedPool)) return null;
   const catalog = byBvid(songs);
   if (raw.targetBvids.length !== TIMELINE_PLACEMENTS || new Set(raw.targetBvids).size !== raw.targetBvids.length || !raw.targetBvids.every((bvid) => typeof bvid === "string" && catalog.has(bvid))) return null;
   const timelineBvids = raw.timeline.map((song) => typeof song === "string" ? song : song?.bvid);
   const timeline = timelineBvids.map((bvid) => catalog.get(bvid)).filter(Boolean);
   if (!timeline.length || timeline.length !== timelineBvids.length || timeline.length !== raw.placements.length + 1 || new Set(timelineBvids).size !== timelineBvids.length) return null;
-  if (raw.placements.length > TIMELINE_PLACEMENTS || raw.placements.some((placement) => !placement || typeof placement.bvid !== "string" || !catalog.has(placement.bvid))) return null;
+  if (raw.placements.length > TIMELINE_PLACEMENTS || raw.placements.some((placement, index) => (
+    !placement
+    || typeof placement.bvid !== "string"
+    || !catalog.has(placement.bvid)
+    || placement.bvid !== raw.targetBvids[index]
+  ))) return null;
+  const placedBvids = new Set(raw.placements.map((placement) => placement.bvid));
+  const futureBvids = new Set(raw.targetBvids.slice(raw.placements.length));
+  if (!raw.placements.every((placement) => timelineBvids.includes(placement.bvid))) return null;
+  if (timelineBvids.some((bvid) => futureBvids.has(bvid))) return null;
+  const anchors = timelineBvids.filter((bvid) => !placedBvids.has(bvid));
+  if (anchors.length !== 1 || raw.targetBvids.includes(anchors[0])) return null;
   const score = raw.placements.filter((placement) => placement.correct === true).length;
   return timelineView({
     ...raw,
     pool: normalizePool(raw.pool),
     placements: raw.placements.slice(0, TIMELINE_PLACEMENTS),
     score,
-    finished: raw.finished === true || raw.placements.length >= TIMELINE_PLACEMENTS,
+    finished: raw.placements.length >= TIMELINE_PLACEMENTS,
     timeline,
   }, songs);
 }

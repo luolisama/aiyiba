@@ -24,8 +24,17 @@ test("single-player modes keep working after their APIs are blocked", async ({ p
   await page.goto("/timeline");
   await dismissGuide(page);
   await expect(page.getByText("本轮作品 · 日期暂时隐藏")).toBeVisible();
-  await page.getByRole("button", { name: "放在最前" }).click();
-  await expect(page.locator(".timeline-board article")).toHaveCount(2);
+  for (let placement = 1; placement <= 10; placement += 1) {
+    await page.getByRole("button", { name: "放在最前" }).click();
+    await expect(page.locator(".timeline-board article")).toHaveCount(placement + 1);
+  }
+  await page.getByRole("button", { name: "战绩", exact: true }).click();
+  let timelineStats = page.getByRole("dialog", { name: /时光机战绩/ });
+  await expect(timelineStats.locator(".stats-grid > div").first()).toContainText("1游玩");
+  await page.reload();
+  await page.getByRole("button", { name: "战绩", exact: true }).click();
+  timelineStats = page.getByRole("dialog", { name: /时光机战绩/ });
+  await expect(timelineStats.locator(".stats-grid > div").first()).toContainText("1游玩");
 });
 
 test("single-player analytics starts only after meaningful local gameplay", async ({ page }) => {
@@ -158,6 +167,10 @@ test("classic mode switches catalogs, accepts pinyin, and exports a result image
   await page.getByRole("button", { name: /切换为扩展题库/ }).click();
   await expect(page).toHaveURL(/\?catalog=extended/);
   await expect(page.getByText(/从扩展题库的 \d+ 首作品中/)).toBeVisible();
+
+  await page.getByRole("navigation", { name: "切换玩法" }).getByRole("link", { name: "线索阶梯" }).click();
+  await expect(page).toHaveURL(/\/clues\?catalog=extended$/);
+  await page.goto("/solo?catalog=extended");
 
   const search = page.getByPlaceholder("输入作品名或拼音搜索…");
   await search.fill("dalabengba");

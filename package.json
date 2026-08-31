@@ -9,7 +9,7 @@
     "dev": "vinext dev",
     "data:clue-index": "node scripts/build-clue-search-index.mjs",
     "analytics:summary": "node scripts/summarize-analytics.mjs",
-    "pk:server": "node server/pk-server.mjs",
+    "pk:server": "node --env-file-if-exists=.env server/pk-server.mjs",
     "build": "vinext build",
     "start": "vinext start",
     "test:e2e": "node scripts/run-e2e.mjs",

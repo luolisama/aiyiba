@@ -6,7 +6,7 @@ import { dateKeyInTimeZone, findAnniversarySpotlight } from "./anniversary.mjs";
 
 export type AnniversarySong = {
   bilibiliUrl: string;
-  gameRole: string;
+  catalogLabel: "标准题库" | "扩展收录";
   name: string;
   publicationDate: string;
   vocalists: string;
@@ -68,7 +68,7 @@ export default function HomeAnniversary({ idPrefix, initialDateKey, songs }: Hom
             <article key={`${song.publicationDate}-${song.name}`}>
               <div>
                 <h3>《{song.name}》</h3>
-                <p>{song.publicationDate.replaceAll("-", ".")} · {song.vocalists} · <b>{song.gameRole === "standard" ? "标准题库" : "扩展收录"}</b></p>
+                <p>{song.publicationDate.replaceAll("-", ".")} · {song.vocalists} · <b>{song.catalogLabel}</b></p>
               </div>
               <strong>{anniversaryLabel(song.anniversaryYears)}</strong>
               <a href={song.bilibiliUrl} target="_blank" rel="noreferrer">去 B 站重听 <span aria-hidden="true">→</span></a>

@@ -316,6 +316,10 @@ test("clue ladder timer resolution enters the next stage and final miss draws", 
   manager.startRoom(created.room.code, created.player.id);
   manager.startPlaying(created.room.code);
   advance(20_000);
+  assert.throws(
+    () => manager.submitClueAction(created.room.code, created.player.id, "skip"),
+    /本阶段已经结束/,
+  );
   const advanced = manager.resolveClueStageIfReady(created.room.code, true);
   assert.equal(advanced.room.clueStage, 2);
   assert.equal(advanced.room.status, "playing");

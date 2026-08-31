@@ -13,14 +13,19 @@ type GamePath = (typeof GAME_LINKS)[number]["href"];
 
 type GameModeNavProps = {
   activePath?: GamePath;
+  catalog?: "normal" | "hardcore";
   className: string;
 };
 
-function GameModeNav({ activePath, className }: GameModeNavProps) {
+function gameHref(href: GamePath, catalog?: "normal" | "hardcore") {
+  return catalog === "hardcore" && href !== "/multi" ? `${href}?catalog=extended` : href;
+}
+
+function GameModeNav({ activePath, catalog, className }: GameModeNavProps) {
   return (
     <nav className={className} aria-label="切换玩法">
       {GAME_LINKS.map((item) => (
-        <Link key={item.href} href={item.href} aria-current={item.href === activePath ? "page" : undefined}>
+        <Link key={item.href} href={gameHref(item.href, catalog)} aria-current={item.href === activePath ? "page" : undefined}>
           <span>{item.label}</span>
         </Link>
       ))}
@@ -30,17 +35,18 @@ function GameModeNav({ activePath, className }: GameModeNavProps) {
 
 type GameMobileMenuProps = {
   activePath?: GamePath;
+  catalog?: "normal" | "hardcore";
   className: string;
 };
 
-function GameMobileMenu({ activePath, className }: GameMobileMenuProps) {
+function GameMobileMenu({ activePath, catalog, className }: GameMobileMenuProps) {
   return (
     <details className={className}>
       <summary aria-label="玩法菜单"><span /><span /><span /></summary>
       <nav aria-label="移动端玩法菜单">
         <Link href="/" aria-current={activePath === undefined ? "page" : undefined}>首页</Link>
         {GAME_LINKS.map((item) => (
-          <Link key={item.href} href={item.href} aria-current={item.href === activePath ? "page" : undefined}>{item.short}</Link>
+          <Link key={item.href} href={gameHref(item.href, catalog)} aria-current={item.href === activePath ? "page" : undefined}>{item.short}</Link>
         ))}
       </nav>
     </details>
@@ -66,19 +72,20 @@ export function CyberBrand({ suffix, linked = true }: CyberBrandProps) {
 
 type GameTopBarProps = {
   activePath: GamePath;
+  catalog?: "normal" | "hardcore";
   modeLabel: string;
   children?: ReactNode;
   className?: string;
 };
 
-export function GameTopBar({ activePath, modeLabel, children, className = "" }: GameTopBarProps) {
+export function GameTopBar({ activePath, catalog, modeLabel, children, className = "" }: GameTopBarProps) {
   return (
     <>
       <header className={`topbar cyber-topbar ${className}`.trim()}>
         <CyberBrand suffix={modeLabel} />
-        <GameModeNav activePath={activePath} className="cyber-mode-nav" />
+        <GameModeNav activePath={activePath} catalog={catalog} className="cyber-mode-nav" />
         <div className="header-actions cyber-header-actions">{children}<ThemeToggle /></div>
-        <GameMobileMenu activePath={activePath} className="cyber-mobile-menu" />
+        <GameMobileMenu activePath={activePath} catalog={catalog} className="cyber-mobile-menu" />
       </header>
       <header className={`topbar classic-topbar ${className}`.trim()}>
         <Link className="brand" href="/" aria-label="返回哎一把主页">
@@ -88,12 +95,12 @@ export function GameTopBar({ activePath, modeLabel, children, className = "" }: 
           </span>
           <span>哎一把 · {modeLabel}</span>
         </Link>
-        <GameModeNav activePath={activePath} className="classic-mode-nav" />
+        <GameModeNav activePath={activePath} catalog={catalog} className="classic-mode-nav" />
         <nav className="header-actions" aria-label="辅助功能">
           {children}
           <ThemeToggle />
         </nav>
-        <GameMobileMenu activePath={activePath} className="classic-mobile-menu" />
+        <GameMobileMenu activePath={activePath} catalog={catalog} className="classic-mobile-menu" />
       </header>
     </>
   );

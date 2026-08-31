@@ -17,6 +17,11 @@ import {
   restoreTimelineRound,
   surrenderClassic,
 } from "../app/local-game-engine.mjs";
+import {
+  normalizeTimelineStats,
+  recordTimelineResult,
+  resetTimelinePoolStats,
+} from "../app/timeline/client-logic.mjs";
 
 const normal = songsJson.items;
 const extended = hardcoreSongsJson.items;
@@ -99,4 +104,41 @@ test("standard and extended local shoes stay isolated and legacy rounds are disc
   assert.equal(restoreClassicRound({ schemaVersion: 4, roundId: "old" }, normal), null);
   assert.equal(restoreClueRound({ schemaVersion: 1, roundId: "old" }, normal), null);
   assert.equal(restoreTimelineRound({ schemaVersion: 1, roundId: "old" }, normal), null);
+});
+
+test("restores reject inconsistent same-version local rounds", () => {
+  const classic = createClassicRound({ songs: normal, nextIndex: firstIndex }).state;
+  assert.equal(restoreClassicRound({ ...classic, finished: true, won: true }, normal).finished, false);
+
+  const clue = createClueRound({ songs: normal, nextIndex: firstIndex }).state;
+  assert.equal(restoreClueRound({ ...clue, roundId: {}, finished: true, won: true }, normal), null);
+  assert.equal(restoreClueRound({ ...clue, finished: true, won: true }, normal).finished, false);
+
+  const timeline = createTimelineRound({ songs: normal, nextIndex: firstIndex });
+  const duplicateTarget = {
+    ...timeline,
+    timeline: [timeline.targetBvids[0], timeline.targetBvids[1]],
+    placements: [{ bvid: timeline.targetBvids[0], correct: false }],
+  };
+  assert.equal(restoreTimelineRound(duplicateTarget, normal), null);
+});
+
+test("timeline statistics stay separated by catalog and deduplicate completed rounds", () => {
+  let stats = normalizeTimelineStats();
+  stats = recordTimelineResult(stats, { roundId: "normal-seven", pool: "normal", score: 7 });
+  stats = recordTimelineResult(stats, { roundId: "normal-seven", pool: "normal", score: 10 });
+  stats = recordTimelineResult(stats, { roundId: "extended-perfect", pool: "hardcore", score: 10 });
+
+  assert.equal(stats.pools.normal.played, 1);
+  assert.equal(stats.pools.normal.totalScore, 7);
+  assert.equal(stats.pools.normal.bestScore, 7);
+  assert.equal(stats.pools.normal.distribution[7], 1);
+  assert.equal(stats.pools.hardcore.played, 1);
+  assert.equal(stats.pools.hardcore.perfectRounds, 1);
+  assert.equal(stats.pools.hardcore.distribution[10], 1);
+
+  const reset = resetTimelinePoolStats(stats, "normal");
+  assert.equal(reset.pools.normal.played, 0);
+  assert.equal(reset.pools.hardcore.played, 1);
+  assert.deepEqual(reset.recordedRoundIds, ["normal-seven", "extended-perfect"]);
 });

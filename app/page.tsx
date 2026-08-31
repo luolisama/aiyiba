@@ -9,6 +9,7 @@ import hardcoreSearchSongsJson from "./data/hardcore-search-songs.json";
 import songsJson from "./data/songs.json";
 import hardcoreSongsJson from "./data/hardcore-songs.json";
 import { dateKeyInTimeZone } from "./anniversary.mjs";
+import { isExtendedOnlySong } from "./catalog-logic.mjs";
 import { compareSong } from "./game-logic.mjs";
 import { siteOriginFromEnv, siteUrl } from "./site-origin.mjs";
 
@@ -53,9 +54,10 @@ const marqueeWords = [
   "YINYANGXIANSHENG",
   "SHENJINGBINGZHIGE",
 ];
+const standardBvids = new Set(songsJson.items.map((song) => song.bvid));
 const anniversarySongs: AnniversarySong[] = hardcoreSongsJson.items.map((song) => ({
   bilibiliUrl: song.bilibiliUrl,
-  gameRole: song.gameRole,
+  catalogLabel: isExtendedOnlySong("hardcore", song.bvid, standardBvids) ? "扩展收录" : "标准题库",
   name: song.name,
   publicationDate: song.publicationDate,
   vocalists: song.vocalists.join("、"),

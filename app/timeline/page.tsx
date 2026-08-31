@@ -14,6 +14,11 @@ import {
   placeTimeline,
   restoreTimelineRound,
 } from "../local-game-engine.mjs";
+import {
+  normalizeTimelineStats,
+  recordTimelineResult,
+  resetTimelinePoolStats,
+} from "./client-logic.mjs";
 
 type PoolName = "normal" | "hardcore";
 const POOL_COUNTS: Record<PoolName, number> = {
@@ -58,14 +63,31 @@ type TimelineState = {
   finished: boolean;
   lastPlacement?: PlacementResult;
 };
+type TimelinePoolStats = {
+  played: number;
+  totalScore: number;
+  bestScore: number;
+  perfectRounds: number;
+  distribution: number[];
+};
+type TimelineStats = {
+  schemaVersion: number;
+  pools: Record<PoolName, TimelinePoolStats>;
+  recordedRoundIds: string[];
+};
 
 const GAME_STORAGE_KEY = "aiyiba-timeline-game-v1";
-const LOCAL_GAME_STORAGE_KEY = "aiyiba-timeline-game-v2";
+const LEGACY_LOCAL_GAME_STORAGE_KEY = "aiyiba-timeline-game-v2";
+const LOCAL_GAME_STORAGE_KEYS: Record<PoolName, string> = {
+  normal: "aiyiba-timeline-game-v3-normal",
+  hardcore: "aiyiba-timeline-game-v3-hardcore",
+};
 const POOLS = {
   normal: songsJson.items,
   hardcore: hardcoreSongsJson.items,
 } as const;
 const RULES_STORAGE_KEY = "aiyiba-timeline-rules-seen-v1";
+const STATS_STORAGE_KEY = "aiyiba-timeline-stats-v1";
 
 function poolFromLocation(): PoolName {
   if (typeof window === "undefined") return "normal";
@@ -92,10 +114,14 @@ function writeGame(state: TimelineState) {
       target: null,
       lastPlacement: undefined,
     };
-    localStorage.setItem(LOCAL_GAME_STORAGE_KEY, JSON.stringify(safe));
-    localStorage.removeItem(GAME_STORAGE_KEY);
+    localStorage.setItem(LOCAL_GAME_STORAGE_KEYS[state.pool], JSON.stringify(safe));
   }
   catch { /* storage is optional */ }
+}
+
+function readStats(): TimelineStats {
+  try { return normalizeTimelineStats(JSON.parse(localStorage.getItem(STATS_STORAGE_KEY) ?? "null")) as TimelineStats; }
+  catch { return normalizeTimelineStats() as TimelineStats; }
 }
 
 function formatDate(value: string) {
@@ -117,6 +143,19 @@ export default function TimelinePage() {
   const [loadError, setLoadError] = useState("");
   const [toast, setToast] = useState("");
   const [showRules, setShowRules] = useState(false);
+  const [showStats, setShowStats] = useState(false);
+  const [stats, setStats] = useState<TimelineStats>(() => normalizeTimelineStats() as TimelineStats);
+
+  const saveFinishedResult = useCallback((state: TimelineState) => {
+    if (!state.finished) return;
+    const next = recordTimelineResult(readStats(), {
+      roundId: state.roundId,
+      pool: state.pool,
+      score: state.score,
+    }) as TimelineStats;
+    try { localStorage.setItem(STATS_STORAGE_KEY, JSON.stringify(next)); } catch { /* optional */ }
+    setStats(next);
+  }, []);
 
   const startRound = useCallback((targetPool: PoolName) => {
     setBusy(true);
@@ -143,10 +182,26 @@ export default function TimelinePage() {
       void (() => {
         const requestedPool = poolFromLocation();
         const songs = POOLS[requestedPool];
+        setStats(readStats());
         let stored: Partial<TimelineState> | null = null;
+        let migratedLegacyKey: string | null = null;
         try {
-          const raw = localStorage.getItem(LOCAL_GAME_STORAGE_KEY) ?? localStorage.getItem(GAME_STORAGE_KEY);
-          stored = raw ? JSON.parse(raw) as Partial<TimelineState> : null;
+          const current = localStorage.getItem(LOCAL_GAME_STORAGE_KEYS[requestedPool]);
+          if (current) {
+            stored = JSON.parse(current) as Partial<TimelineState>;
+          } else {
+            for (const key of [LEGACY_LOCAL_GAME_STORAGE_KEY, GAME_STORAGE_KEY]) {
+              const legacy = localStorage.getItem(key);
+              if (!legacy) continue;
+              const candidate = JSON.parse(legacy) as Partial<TimelineState>;
+              const legacyPool = (candidate as { pool?: unknown }).pool;
+              const candidatePool = legacyPool === "hardcore" || legacyPool === "extended" ? "hardcore" : "normal";
+              if (candidatePool !== requestedPool) continue;
+              stored = candidate;
+              migratedLegacyKey = key;
+              break;
+            }
+          }
         } catch {
           stored = null;
         }
@@ -160,6 +215,10 @@ export default function TimelinePage() {
         setGame(state);
         setPool(state.pool);
         writeGame(state);
+        if (state.finished) saveFinishedResult(state);
+        if (migratedLegacyKey) {
+          try { localStorage.removeItem(migratedLegacyKey); } catch { /* storage is optional */ }
+        }
         setLoadError("");
         try {
           if (localStorage.getItem(RULES_STORAGE_KEY) !== "seen") setShowRules(true);
@@ -167,7 +226,7 @@ export default function TimelinePage() {
       })();
     });
     return () => { cancelled = true; window.cancelAnimationFrame(frame); };
-  }, []);
+  }, [saveFinishedResult]);
 
   function place(slot: number) {
     if (!game || game.finished || busy) return;
@@ -180,6 +239,7 @@ export default function TimelinePage() {
         trackGameEvent({ event: "game_engaged", roundId: game.roundId, mode: "timeline", pool: game.pool });
       }
       if (state.finished) {
+        saveFinishedResult(state);
         trackGameEvent({
           event: "game_completed",
           roundId: state.roundId,
@@ -234,12 +294,24 @@ export default function TimelinePage() {
       trackGameEvent({ event: "replay_requested", roundId: game.roundId, mode: "timeline", pool: game.pool });
     }
   }
+  function resetLocalStats() {
+    if (!window.confirm(`清除${poolLabel(pool)}的时光机本机战绩？当前这一局会保留。`)) return;
+    const next = resetTimelinePoolStats(readStats(), pool) as TimelineStats;
+    try { localStorage.setItem(STATS_STORAGE_KEY, JSON.stringify(next)); } catch { /* optional */ }
+    setStats(next);
+    setShowStats(false);
+    setToast("本机战绩已清除");
+    window.setTimeout(() => setToast(""), 2400);
+  }
   const placementByBvid = new Map(game.placements.map((placement) => [placement.bvid, placement]));
+  const activeStats = stats.pools[pool];
+  const averageScore = activeStats.played ? (activeStats.totalScore / activeStats.played).toFixed(1) : "0.0";
 
   return (
     <main className="site-shell timeline-shell">
-      <GameTopBar activePath="/timeline" modeLabel="时光机">
+      <GameTopBar activePath="/timeline" catalog={pool} modeLabel="时光机">
           <button className="pk-entry-link" type="button" onClick={() => setShowRules(true)}>说明</button>
+          <button className="pk-entry-link" type="button" onClick={() => setShowStats(true)}>战绩</button>
       </GameTopBar>
 
       <section className="hero timeline-hero">
@@ -307,11 +379,35 @@ export default function TimelinePage() {
       </section>
 
       <footer>
-        <div className="footer-meta"><span>时光机 · {poolLabel(pool)} · 10 轮</span><span>本玩法暂不记录战绩。</span></div>
+        <div className="footer-meta"><span>时光机 · {poolLabel(pool)} · 10 轮</span><span>战绩仅保存在当前浏览器。</span></div>
         <button type="button" onClick={() => setShowRules(true)}>收录与判定规则</button>
       </footer>
 
       <RulesDialog open={showRules} onClose={closeRules} mode="timeline" />
+
+      {showStats && (
+        <div className="modal-backdrop" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && setShowStats(false)}>
+          <section className="modal" role="dialog" aria-modal="true" aria-labelledby="timeline-stats-title">
+            <button className="modal-close" type="button" onClick={() => setShowStats(false)} aria-label="关闭">×</button>
+            <h2 id="timeline-stats-title">{poolLabel(pool)} · 时光机战绩</h2>
+            <div className="stats-grid">
+              <div><strong>{activeStats.played}</strong><span>游玩</span></div>
+              <div><strong>{averageScore}</strong><span>平均得分</span></div>
+              <div><strong>{activeStats.bestScore}</strong><span>最高得分</span></div>
+              <div><strong>{activeStats.perfectRounds}</strong><span>满分次数</span></div>
+            </div>
+            <h3>得分分布</h3>
+            <div className="distribution">
+              {activeStats.distribution.map((count, score) => {
+                const max = Math.max(...activeStats.distribution, 1);
+                return <div key={score}><span>{score}</span><i style={{ width: `${Math.max(8, count / max * 100)}%` }}>{count}</i></div>;
+              })}
+            </div>
+            <button className="reset-button" type="button" onClick={resetLocalStats}>清除当前题库战绩</button>
+            <p className="fine-print">标准题库与扩展题库分别统计；当前旅程会保留。</p>
+          </section>
+        </div>
+      )}
 
       {toast && <div className="toast" role="status">{toast}</div>}
     </main>

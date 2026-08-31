@@ -75,7 +75,11 @@ type PoolStats = { played: number; wins: number; bestStep: number; totalWinningS
 type ClueStats = { schemaVersion: number; pools: Record<PoolName, PoolStats>; recordedRoundIds: string[] };
 
 const GAME_STORAGE_KEY = "aiyiba-clues-game-v1";
-const LOCAL_GAME_STORAGE_KEY = "aiyiba-clues-game-v2";
+const LEGACY_LOCAL_GAME_STORAGE_KEY = "aiyiba-clues-game-v2";
+const LOCAL_GAME_STORAGE_KEYS: Record<PoolName, string> = {
+  normal: "aiyiba-clues-game-v3-normal",
+  hardcore: "aiyiba-clues-game-v3-hardcore",
+};
 const SHOE_STORAGE_KEYS: Record<PoolName, string> = { normal: "aiyiba-clues-shoe-v2-normal", hardcore: "aiyiba-clues-shoe-v2-hardcore" };
 const STATS_STORAGE_KEY = "aiyiba-clues-stats-v1";
 const RULES_STORAGE_KEY = "aiyiba-clues-rules-seen-v1";
@@ -125,8 +129,7 @@ function writeGame(state: GameState) {
       type: action.type,
       ...(action.bvid ? { bvid: action.bvid } : {}),
     }));
-    localStorage.setItem(LOCAL_GAME_STORAGE_KEY, JSON.stringify(safe));
-    localStorage.removeItem(GAME_STORAGE_KEY);
+    localStorage.setItem(LOCAL_GAME_STORAGE_KEYS[state.pool], JSON.stringify(safe));
   } catch { /* storage is optional */ }
 }
 
@@ -213,9 +216,24 @@ export default function ClueLadderPage() {
         const requestedPool = poolFromLocation();
         const songs = POOLS[requestedPool].items;
         let stored: Partial<GameState> | null = null;
+        let migratedLegacyKey: string | null = null;
         try {
-          const raw = localStorage.getItem(LOCAL_GAME_STORAGE_KEY) ?? localStorage.getItem(GAME_STORAGE_KEY);
-          stored = raw ? JSON.parse(raw) as Partial<GameState> : null;
+          const current = localStorage.getItem(LOCAL_GAME_STORAGE_KEYS[requestedPool]);
+          if (current) {
+            stored = JSON.parse(current) as Partial<GameState>;
+          } else {
+            for (const key of [LEGACY_LOCAL_GAME_STORAGE_KEY, GAME_STORAGE_KEY]) {
+              const legacy = localStorage.getItem(key);
+              if (!legacy) continue;
+              const candidate = JSON.parse(legacy) as Partial<GameState>;
+              const legacyPool = (candidate as { pool?: unknown }).pool;
+              const candidatePool = legacyPool === "hardcore" || legacyPool === "extended" ? "hardcore" : "normal";
+              if (candidatePool !== requestedPool) continue;
+              stored = candidate;
+              migratedLegacyKey = key;
+              break;
+            }
+          }
         } catch {
           stored = null;
         }
@@ -241,6 +259,9 @@ export default function ClueLadderPage() {
         if (cancelled) return;
         setGame(state);
         writeGame(state);
+        if (migratedLegacyKey) {
+          try { localStorage.removeItem(migratedLegacyKey); } catch { /* storage is optional */ }
+        }
         setPool(state.pool);
         if (state.finished) {
           saveFinishedResult(state);
@@ -400,7 +421,7 @@ export default function ClueLadderPage() {
 
   return (
     <main className="site-shell clue-shell">
-      <GameTopBar activePath="/clues" modeLabel="线索阶梯">
+      <GameTopBar activePath="/clues" catalog={pool} modeLabel="线索阶梯">
           <button className="pk-entry-link" onClick={() => setShowRules(true)}>说明</button>
           <button className="pk-entry-link" onClick={() => setShowStats(true)}>战绩</button>
       </GameTopBar>

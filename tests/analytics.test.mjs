@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
-import { appendFile, mkdtemp, readFile, rm } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import { appendFile, mkdir, mkdtemp, readFile, rm, symlink } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 
 import {
   createMultiplayerAnalyticsEvent,
@@ -13,6 +16,10 @@ import {
 } from "../app/analytics-model.mjs";
 import { createAnalyticsSink } from "../server/analytics-sink.mjs";
 import { readAnalyticsEvents } from "../scripts/summarize-analytics.mjs";
+
+const execFileAsync = promisify(execFile);
+const repositoryRoot = fileURLToPath(new URL("..", import.meta.url));
+const summaryScript = path.join(repositoryRoot, "scripts", "summarize-analytics.mjs");
 
 function clientEvent(overrides = {}) {
   return {
@@ -168,4 +175,37 @@ test("analytics retention includes the exact 90-day boundary", () => {
   assert.equal(isEventWithinRetention("2026-05-30T12:00:00.000Z", now), true);
   assert.equal(isEventWithinRetention("2026-05-30T11:59:59.999Z", now), false);
   assert.equal(isEventWithinRetention("invalid", now), false);
+});
+
+test("analytics summary CLI runs through a linked release directory", async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), "aiyiba-analytics-cli-"));
+  try {
+    const directory = path.join(root, "events");
+    const linkedRoot = path.join(root, "current");
+    await mkdir(directory);
+    await symlink(repositoryRoot, linkedRoot, "junction");
+    const sink = createAnalyticsSink({ source: "web", directory });
+    await sink.write(parseClientAnalyticsEvent(clientEvent()), {
+      receivedAt: "2026-08-28T12:34:56.000Z",
+      ip: "203.0.113.10",
+      userAgent: "Browser/1",
+    });
+    const linkedScript = path.join(linkedRoot, "scripts", "summarize-analytics.mjs");
+    const { stdout } = await execFileAsync(process.execPath, [linkedScript, "--dir", directory, "--from", "2026-08-28", "--to", "2026-08-28"]);
+    assert.equal(JSON.parse(stdout).engagedRounds, 1);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("analytics summary CLI rejects impossible calendar dates", async () => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), "aiyiba-analytics-date-"));
+  try {
+    await assert.rejects(
+      execFileAsync(process.execPath, [summaryScript, "--dir", directory, "--from", "2026-02-30", "--to", "2026-02-30"]),
+      (error) => /YYYY-MM-DD/u.test(String(error.stderr)),
+    );
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });
