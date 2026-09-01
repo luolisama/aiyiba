@@ -190,7 +190,7 @@ test("classic mode switches catalogs, accepts pinyin, and exports a result image
   await expect.poll(() => preview.evaluate((image) => image.naturalWidth)).toBe(1080);
 });
 
-test("two players can join a classic room and use the host-selected catalog", async ({ browser }) => {
+test("two players can join a classic room and use keyboard search", async ({ browser }) => {
   const hostContext = await browser.newContext();
   const guestContext = await browser.newContext();
   const host = await hostContext.newPage();
@@ -210,6 +210,41 @@ test("two players can join a classic room and use the host-selected catalog", as
     await expect(host.getByText("浏览器访客", { exact: true })).toBeVisible();
     await host.getByRole("group", { name: "选择多人题库" }).getByRole("button", { name: "扩展", exact: true }).click();
     await expect(guest.locator(".pk-room-code").getByText(/扩展题库/)).toBeVisible();
+
+    await Promise.all([
+      host.getByRole("button", { name: "准备开始" }).click(),
+      guest.getByRole("button", { name: "准备开始" }).click(),
+    ]);
+    const startButton = host.getByRole("button", { name: "开始多人游戏" });
+    await expect(startButton).toBeEnabled();
+    await startButton.click();
+
+    const search = host.getByRole("combobox", { name: "搜索多人模式作品" });
+    await expect(search).toBeVisible({ timeout: 10_000 });
+    await search.fill("shi");
+    const options = host.getByRole("listbox").getByRole("option");
+    await expect(options).toHaveCount(8);
+    const firstOptionId = await options.nth(0).getAttribute("id");
+    const secondOptionId = await options.nth(1).getAttribute("id");
+    const secondOptionName = await options.nth(1).locator("span").textContent();
+    expect(firstOptionId).toBeTruthy();
+    expect(secondOptionId).toBeTruthy();
+    expect(secondOptionName).toBeTruthy();
+    await expect(search).toHaveAttribute("aria-activedescendant", firstOptionId);
+
+    await search.press("ArrowDown");
+    await expect(search).toHaveAttribute("aria-activedescendant", secondOptionId);
+    await expect(options.nth(1)).toHaveClass(/active/u);
+    await search.press("Enter");
+    await expect(search).toHaveValue(secondOptionName);
+    await expect(host.locator(".pk-scoreboard span").filter({ hasText: "浏览器房主（你）" })).toContainText("0/6");
+
+    await search.press("Enter");
+    await expect.poll(async () => {
+      const scoreboard = host.locator(".pk-scoreboard span").filter({ hasText: "浏览器房主（你）" });
+      if (await scoreboard.count()) return await scoreboard.textContent();
+      return await host.locator(".pk-final-score").textContent();
+    }).toMatch(/1(?:\/6| 次)/u);
   } finally {
     await hostContext.close();
     await guestContext.close();

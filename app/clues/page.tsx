@@ -457,15 +457,23 @@ export default function ClueLadderPage() {
               onKeyDown={onSearchKeyDown}
               placeholder={game.finished ? "本局已结束" : "输入作品名或拼音搜索…"}
               enterKeyHint="search"
+              role="combobox"
               aria-label="搜索作品"
+              aria-autocomplete="list"
+              aria-controls="clue-suggestions"
+              aria-expanded={Boolean(query && !game.finished && !selectedBvid)}
+              aria-activedescendant={query && !game.finished && !selectedBvid && matches[activeOption]
+                ? `clue-option-${matches[activeOption].bvid}`
+                : undefined}
               autoComplete="off"
             />
             {query && !game.finished && !selectedBvid && (
-              <div className="suggestions" role="listbox">
+              <div className="suggestions" role="listbox" id="clue-suggestions">
                 {matches.length ? matches.map((song, index) => (
                   <button
                     type="button"
                     role="option"
+                    id={`clue-option-${song.bvid}`}
                     aria-selected={selectedBvid === song.bvid}
                     className={index === activeOption ? "active" : ""}
                     key={song.bvid}
