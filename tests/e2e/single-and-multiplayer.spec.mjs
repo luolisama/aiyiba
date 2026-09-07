@@ -221,6 +221,7 @@ test("two players can join a classic room and use keyboard search", async ({ bro
 
     const search = host.getByRole("combobox", { name: "搜索多人模式作品" });
     await expect(search).toBeVisible({ timeout: 10_000 });
+    await host.mouse.move(0, 0);
     await search.fill("shi");
     const options = host.getByRole("listbox").getByRole("option");
     await expect(options).toHaveCount(8);
