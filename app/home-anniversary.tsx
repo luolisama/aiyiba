@@ -48,10 +48,10 @@ export default function HomeAnniversary({ idPrefix, initialDateKey, songs }: Hom
       ? spotlight.songs[0].anniversaryYears === 0
         ? "你知道吗？这首歌今天刚刚投稿"
         : `你知道吗？这首歌今天投稿满 ${spotlight.songs[0].anniversaryYears} 周年`
-      : `你知道吗？今天有 ${spotlight.songs.length} 首作品迎来投稿纪念日`
+      : `你知道吗？今天是 ${spotlight.songs.length} 首作品的投稿纪念日`
     : spotlight.songs.length === 1
-      ? `${relativeDayLabel(spotlight.daysUntil)}有一首作品迎来投稿 ${spotlight.songs[0].anniversaryYears} 周年`
-      : `${relativeDayLabel(spotlight.daysUntil)}有 ${spotlight.songs.length} 首作品迎来投稿纪念日`;
+      ? `${relativeDayLabel(spotlight.daysUntil)}有一首作品投稿满 ${spotlight.songs[0].anniversaryYears} 周年`
+      : `${relativeDayLabel(spotlight.daysUntil)}是 ${spotlight.songs.length} 首作品的投稿纪念日`;
 
   return (
     <section className={`home-anniversary ${isToday ? "is-today" : "is-upcoming"}`} aria-labelledby={`${idPrefix}-anniversary-title`}>

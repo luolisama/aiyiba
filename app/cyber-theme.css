@@ -221,7 +221,7 @@ html[data-visual-theme="cyber"] .home-kicker,
 html[data-visual-theme="cyber"] .home-section-heading > span,
 html[data-visual-theme="cyber"] .pixel-kicker {
   color: var(--acid);
-  font: 400 10px/1.5 "Press Start 2P", ui-monospace, Consolas, monospace;
+  font: 400 10px/1.5 "Press Start 2P", "ZCOOL QingKe HuangYou", ui-monospace, Consolas, monospace;
   letter-spacing: .08em;
 }
 html[data-visual-theme="cyber"] .home-kicker span { display: inline-block; margin-right: 10px; padding: 6px 8px; color: var(--bg-base); background: var(--acid); }
@@ -243,7 +243,7 @@ html[data-visual-theme="cyber"] .pixel-cta.primary:hover { box-shadow: 8px 8px 0
 html[data-visual-theme="cyber"] .home-demo-board { min-width: 0; padding: 16px; border: 2px solid var(--text-1); background: var(--surface); box-shadow: 8px 8px 0 var(--acid); transform: none; }
 html[data-visual-theme="cyber"] .demo-board-top { display: flex; align-items: center; gap: 12px; padding-bottom: 13px; border-bottom: 2px solid var(--border); }
 html[data-visual-theme="cyber"] .demo-board-top span,
-html[data-visual-theme="cyber"] .demo-board-top i { color: var(--acid); font: 400 9px/1 "Press Start 2P", ui-monospace, monospace; font-style: normal; }
+html[data-visual-theme="cyber"] .demo-board-top i { color: var(--acid); font: 400 10px/1 "Press Start 2P", ui-monospace, monospace; font-style: normal; }
 html[data-visual-theme="cyber"] .demo-board-top strong { margin-right: auto; font-size: 12px; letter-spacing: .12em; }
 html[data-visual-theme="cyber"] .demo-board-head,
 html[data-visual-theme="cyber"] .demo-board-row { display: grid; grid-template-columns: 1.25fr 1.08fr .78fr .56fr .72fr .68fr; gap: 5px; }
@@ -292,7 +292,7 @@ html[data-visual-theme="cyber"] .anniversary-date {
 html[data-visual-theme="cyber"] .anniversary-date small,
 html[data-visual-theme="cyber"] .anniversary-date span { color: var(--anniversary-accent); font-family: "Press Start 2P", ui-monospace, monospace; }
 html[data-visual-theme="cyber"] .anniversary-date strong { font: 400 22px/1.2 "Press Start 2P", ui-monospace, monospace; letter-spacing: -.04em; }
-html[data-visual-theme="cyber"] .anniversary-kicker { color: var(--anniversary-accent); font: 400 8px/1.5 "Press Start 2P", ui-monospace, monospace; }
+html[data-visual-theme="cyber"] .anniversary-kicker { color: var(--anniversary-accent); font: 400 10px/1.5 "Press Start 2P", "ZCOOL QingKe HuangYou", ui-monospace, monospace; }
 html[data-visual-theme="cyber"] .anniversary-content > h2 { color: var(--text-1); font: 900 clamp(27px, 3vw, 38px)/1.08 "ZCOOL QingKe HuangYou", "Microsoft YaHei UI", sans-serif; letter-spacing: -.02em; }
 html[data-visual-theme="cyber"] .anniversary-song-list article { border-color: var(--border); }
 html[data-visual-theme="cyber"] .anniversary-song-list h3 { color: var(--text-1); }
@@ -390,7 +390,7 @@ html[data-visual-theme="cyber"] .pk-hero h1 { color: var(--text-1); font: 900 cl
 html[data-visual-theme="cyber"] .hero h1 span { color: var(--acid); }
 html[data-visual-theme="cyber"] .clue-hero h1 span { color: var(--cyan); }
 html[data-visual-theme="cyber"] .timeline-hero h1 span { color: var(--amber); }
-html[data-visual-theme="cyber"] .round-status { color: var(--acid); font-family: "Press Start 2P", ui-monospace, monospace; font-size: 9px; }
+html[data-visual-theme="cyber"] .round-status { color: var(--acid); font-family: "Press Start 2P", "ZCOOL QingKe HuangYou", ui-monospace, monospace; font-size: 10px; }
 html[data-visual-theme="cyber"] .clue-shell .round-status { color: var(--cyan); }
 html[data-visual-theme="cyber"] .timeline-shell .round-status { color: var(--amber); }
 html[data-visual-theme="cyber"] .intro,
@@ -611,6 +611,7 @@ html[data-visual-theme="cyber"] .stats-grid > div,
 html[data-visual-theme="cyber"] .stats-mode-tabs,
 html[data-visual-theme="cyber"] .answer-card,
 html[data-visual-theme="cyber"] .pk-guide-grid > div { border: 2px solid var(--border); border-radius: var(--r-md); background: var(--bg-raised); }
+html[data-visual-theme="cyber"] .rule-samples .partial { color: var(--bg-base); background: var(--near); }
 html[data-visual-theme="cyber"] .clue-rule-steps,
 html[data-visual-theme="cyber"] .timeline-rule-steps { gap: 8px; }
 html[data-visual-theme="cyber"] .clue-rule-steps li,
@@ -682,10 +683,10 @@ html[data-visual-theme="cyber"] .pk-footer-actions .pk-rules-link { color: var(-
 
   html[data-visual-theme="cyber"] .home-hero { width: calc(100% - 28px); min-height: auto; margin: 0 auto; padding: 38px 0 30px; gap: 30px; }
   html[data-visual-theme="cyber"] .home-hero-copy { text-align: left; }
-  html[data-visual-theme="cyber"] .home-kicker { font-size: 7px; line-height: 1.8; }
+  html[data-visual-theme="cyber"] .home-kicker { font-size: 10px; line-height: 1.8; }
   html[data-visual-theme="cyber"] .home-kicker span { margin-right: 6px; padding: 5px; }
   html[data-visual-theme="cyber"] .home-hero h1 { margin-top: 18px; font-size: clamp(62px, 20vw, 82px); }
-  html[data-visual-theme="cyber"] .home-hero-english { margin: 18px 0 0; font-size: 8px; }
+  html[data-visual-theme="cyber"] .home-hero-english { margin: 18px 0 0; font-size: 10px; }
   html[data-visual-theme="cyber"] .home-hero-copy > .home-hero-intro { margin: 18px 0 0; font-size: 13px; line-height: 1.75; }
   html[data-visual-theme="cyber"] .home-hero-actions { display: grid; gap: 12px; }
   html[data-visual-theme="cyber"] .home-anniversary { width: calc(100% - 28px); margin-top: 36px; padding: 16px; box-shadow: 5px 5px 0 var(--anniversary-accent); }
@@ -695,8 +696,8 @@ html[data-visual-theme="cyber"] .pk-footer-actions .pk-rules-link { color: var(-
   html[data-visual-theme="cyber"] .home-demo-board { padding: 11px; box-shadow: 5px 5px 0 var(--acid); transform: none; }
   html[data-visual-theme="cyber"] .demo-board-top { gap: 7px; }
   html[data-visual-theme="cyber"] .demo-board-top span,
-  html[data-visual-theme="cyber"] .demo-board-top i { font-size: 6px; }
-  html[data-visual-theme="cyber"] .demo-board-top strong { font-size: 9px; }
+  html[data-visual-theme="cyber"] .demo-board-top i { font-size: 10px; }
+  html[data-visual-theme="cyber"] .demo-board-top strong { font-size: 10px; }
   html[data-visual-theme="cyber"] .demo-board-row > * { min-height: 58px; font-size: 10px; }
   html[data-visual-theme="cyber"] .demo-board-head,
   html[data-visual-theme="cyber"] .demo-board-row { grid-template-columns: 1.25fr 1fr .8fr; gap: 4px; }
