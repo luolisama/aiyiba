@@ -5,12 +5,7 @@ import { siteOriginFromEnv, siteVerificationTokenFromEnv } from "./app/site-orig
 // Set USE_POLLING=1 when the local environment cannot deliver filesystem events.
 const usePolling = /^(1|true)$/iu.test(process.env.USE_POLLING ?? "");
 
-const localBindingConfig = {
-  main: "./worker/index.ts",
-  compatibility_flags: ["nodejs_compat"],
-};
-
-export default defineConfig(async ({ mode }) => {
+export default defineConfig(({ mode }) => {
   const loadedEnv = loadEnv(mode, process.cwd(), "");
   const envSiteOrigin = process.env.SITE_ORIGIN ?? loadedEnv.SITE_ORIGIN;
   const configuredSiteOrigin = siteOriginFromEnv(envSiteOrigin);
@@ -30,15 +25,6 @@ export default defineConfig(async ({ mode }) => {
     throw new TypeError("ANALYTICS_INGEST_URL must be a loopback analytics endpoint");
   }
 
-  // Keep Wrangler and Miniflare state project-local. These are non-secret tool
-  // settings; application environment belongs in ignored `.env*` files.
-  process.env.WRANGLER_WRITE_LOGS ??= "false";
-  process.env.WRANGLER_LOG_PATH ??= ".wrangler/logs";
-  process.env.MINIFLARE_REGISTRY_PATH ??= ".wrangler/registry";
-
-  // Wrangler snapshots its log path while the Cloudflare plugin is imported.
-  const { cloudflare } = await import("@cloudflare/vite-plugin");
-
   return {
     define: {
       "process.env.SITE_ORIGIN": JSON.stringify(configuredSiteOrigin),
@@ -47,15 +33,10 @@ export default defineConfig(async ({ mode }) => {
       "process.env.ANALYTICS_TRUST_PROXY": JSON.stringify(analyticsTrustProxy ? "true" : "false"),
       "process.env.ANALYTICS_INGEST_URL": JSON.stringify(analyticsIngestUrl),
     },
-    server: usePolling
-      ? { watch: { useFsEvents: false, usePolling: true } }
-      : undefined,
-    plugins: [
-      vinext(),
-      cloudflare({
-        viteEnvironment: { name: "rsc", childEnvironments: ["ssr"] },
-        config: localBindingConfig,
-      }),
-    ],
+    server: {
+      port: 3000,
+      watch: usePolling ? { useFsEvents: false, usePolling: true } : undefined,
+    },
+    plugins: [vinext()],
   };
 });
