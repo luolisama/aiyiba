@@ -80,6 +80,8 @@ npm test
 npm run test:e2e
 ```
 
+类型检查使用 TypeScript 7 编译器；ESLint 所需的编译器 API 由 `typescript` 别名指向的官方 TypeScript 6 兼容包提供。
+
 日常 CI 运行类型检查、Lint、构建和核心逻辑测试；浏览器 E2E 由维护者在发版前手动触发。
 
 如果本地文件监听环境不支持文件系统事件，可在启动前设置 `USE_POLLING=1`（或 `true`）启用轮询。
