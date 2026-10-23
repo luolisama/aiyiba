@@ -20,6 +20,10 @@ updates:
           - react-server-dom-webpack
           - "@types/react"
           - "@types/react-dom"
+      typescript-toolchain:
+        patterns:
+          - typescript
+          - "@typescript/native"
       eslint:
         patterns:
           - eslint
@@ -34,6 +38,7 @@ updates:
         dependency-type: development
         exclude-patterns:
           - typescript
+          - "@typescript/native"
           - vinext
         update-types:
           - minor
