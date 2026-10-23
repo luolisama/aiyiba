@@ -4,6 +4,7 @@ import test from "node:test";
 import songsJson from "../app/data/songs.json" with { type: "json" };
 import hardcoreSongsJson from "../app/data/hardcore-songs.json" with { type: "json" };
 import { createPkManager } from "../server/pk-game.mjs";
+import { recordPkRound } from "../app/pk/client-logic.mjs";
 
 function eventOf(result, type) {
   return result.events.find((item) => item.type === type);
@@ -359,6 +360,7 @@ test("expired playing guests can recover an idempotent local-loss summary", () =
     roundId: created.room.roundId,
     pool: "normal",
     mode: "normal",
+    gameType: "classic",
     attempts: 1,
   });
   assert.deepEqual(manager.forfeitSummary(created.room.code, guest.token, guestDeviceId), manager.forfeitSummary(created.room.code, guest.token, guestDeviceId));
@@ -414,3 +416,38 @@ test("absolute room lifetime cannot be extended by activity", () => {
   assert.equal(manager.cleanup().length, 1);
   assert.equal(manager.roomCount(), 0);
 });
+
+for (const pool of ["normal", "hardcore"]) {
+  test(`expired clue guests retain their game type and ${pool} statistics`, () => {
+    const { manager, advance } = makeManager({ forfeitReceiptTtlMs: 100 });
+    const created = manager.createRoom("host", "normal", "private", "host-device", pool, "clues");
+    const joined = manager.joinRoom(created.room.code, "guest", "guest-device");
+    const guest = joined.player;
+    for (const player of [created.player, guest]) manager.setReady(created.room.code, player.id);
+    manager.startRoom(created.room.code, created.player.id);
+    manager.startPlaying(created.room.code);
+    manager.submitClueAction(created.room.code, guest.id, "skip");
+    manager.disconnect(guest.id);
+    manager.expireDisconnected(created.room.code, guest.id);
+    const summary = manager.forfeitSummary(created.room.code, guest.token, guest.deviceId);
+    assert.deepEqual(summary, {
+      roundId: created.room.roundId,
+      pool,
+      mode: "normal",
+      gameType: "clues",
+      attempts: 1,
+    });
+    const result = { ...summary, outcome: "loss" };
+    const stats = recordPkRound(null, result);
+    assert.equal(stats.pools[pool].clues.losses, 1);
+    assert.equal(stats.pools[pool].clues.totalGuesses, 1);
+    assert.equal(stats.pools[pool].modes.normal.played, 0);
+    const otherPool = pool === "normal" ? "hardcore" : "normal";
+    assert.equal(stats.pools[otherPool].clues.played, 0);
+    assert.deepEqual(recordPkRound(stats, result), stats);
+    assert.deepEqual(manager.forfeitSummary(created.room.code, guest.token, guest.deviceId), summary);
+    advance(101);
+    manager.cleanup();
+    assert.equal(manager.forfeitSummary(created.room.code, guest.token, guest.deviceId), null);
+  });
+}

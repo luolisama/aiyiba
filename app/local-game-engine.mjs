@@ -84,7 +84,8 @@ export function classicView(state, songs) {
 
 export function createClassicRound({ pool = "normal", mode = "normal", songs, shoe = null, nextIndex = secureRandomIndex }) {
   const allBvids = songs.map((song) => song.bvid);
-  const draw = drawFromShoe(readLocalShoe(shoe, allBvids) ?? createShoe(allBvids, [], nextIndex), allBvids, null, nextIndex);
+  const activeShoe = readLocalShoe(shoe, allBvids) ?? createShoe(allBvids, [], nextIndex);
+  const draw = drawFromShoe(activeShoe, allBvids, activeShoe.seen.at(-1), nextIndex);
   const state = {
     schemaVersion: LOCAL_CLASSIC_SCHEMA_VERSION,
     roundId: roundId("solo"),
@@ -169,7 +170,8 @@ export function clueView(state, songs) {
 
 export function createClueRound({ pool = "normal", songs, shoe = null, nextIndex = secureRandomIndex }) {
   const allBvids = songs.map((song) => song.bvid);
-  const draw = drawFromShoe(readLocalShoe(shoe, allBvids) ?? createShoe(allBvids, [], nextIndex), allBvids, null, nextIndex);
+  const activeShoe = readLocalShoe(shoe, allBvids) ?? createShoe(allBvids, [], nextIndex);
+  const draw = drawFromShoe(activeShoe, allBvids, activeShoe.seen.at(-1), nextIndex);
   const state = {
     schemaVersion: LOCAL_CLUE_SCHEMA_VERSION,
     roundId: roundId("clue"),

@@ -142,3 +142,33 @@ test("timeline statistics stay separated by catalog and deduplicate completed ro
   assert.equal(reset.pools.hardcore.played, 1);
   assert.deepEqual(reset.recordedRoundIds, ["normal-seven", "extended-perfect"]);
 });
+
+for (const [label, createRound] of [["classic", createClassicRound], ["clues", createClueRound]]) {
+  for (const [pool, songs] of [["normal", normal], ["hardcore", extended]]) {
+    test(`${label} ${pool} avoids repeating the last answer when a shoe rolls over`, () => {
+      const keepOrder = (length) => length - 1;
+      let shoe = createLocalShoe(songs.map((song) => song.bvid), [], keepOrder);
+      let previous;
+      for (let index = 0; index < songs.length; index += 1) {
+        const created = createRound({ pool, songs, shoe, nextIndex: keepOrder });
+        previous = created.state.answerBvid;
+        shoe = created.shoe;
+      }
+      assert.equal(shoe.remaining.length, 0);
+      const before = structuredClone(shoe);
+      // Put the previous cycle's final answer first in the reshuffled shoe.
+      const nextIndex = (length) => length === songs.length ? 0 : length - 1;
+      const next = createRound({ pool, songs, shoe, nextIndex });
+      assert.notEqual(next.state.answerBvid, previous);
+      assert.deepEqual(shoe, before);
+      assert.equal(next.shoe.seen.length, 1);
+      assert.equal(new Set([...next.shoe.seen, ...next.shoe.remaining]).size, songs.length);
+    });
+  }
+  test(`${label} still permits a single-song shoe to roll over`, () => {
+    const songs = normal.slice(0, 1);
+    const first = createRound({ songs, nextIndex: () => 0 });
+    const next = createRound({ songs, shoe: first.shoe, nextIndex: () => 0 });
+    assert.equal(next.state.answerBvid, first.state.answerBvid);
+  });
+}

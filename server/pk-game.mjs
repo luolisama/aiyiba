@@ -211,6 +211,7 @@ export function createPkManager(catalog, options = {}) {
       roundId: receipt.roundId,
       pool: receipt.pool,
       mode: receipt.mode,
+      gameType: receipt.gameType,
       attempts: receipt.attempts,
     };
   }
